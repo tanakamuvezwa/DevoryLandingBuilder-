@@ -4,7 +4,6 @@
   "description": "Devory Landing Builder - Build and export landing pages fast",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
     "dev": "node server.js"
   },
   "keywords": [],

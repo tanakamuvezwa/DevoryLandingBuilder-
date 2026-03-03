@@ -10,7 +10,7 @@ const DATA_FILE = path.join(__dirname, 'projects.json');
 
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Initialize data file if it doesn't exist
 if (!fs.existsSync(DATA_FILE)) {
