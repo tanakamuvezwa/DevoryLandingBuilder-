@@ -1,5 +1,35 @@
 {
-    "outputDirectory": ".",
-    "cleanUrls": true,
-    "trailingSlash": false
+    "version": 2,
+    "builds": [
+        {
+            "src": "api/*.js",
+            "use": "@vercel/node"
+        },
+        {
+            "src": "index.html",
+            "use": "@vercel/static"
+        },
+        {
+            "src": "script.js",
+            "use": "@vercel/static"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/api/projects",
+            "dest": "/api/projects.js"
+        },
+        {
+            "src": "/api/contact",
+            "dest": "/api/contact.js"
+        },
+        {
+            "src": "/script.js",
+            "dest": "/script.js"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/index.html"
+        }
+    ]
 }
