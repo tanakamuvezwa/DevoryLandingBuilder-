@@ -84,16 +84,15 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function loadProjectFromBackend() {
-    try {
-        const res = await fetch('http://localhost:3000/api/projects');
-        if (res.ok) {
-            const data = await res.json();
-            if (data && Object.keys(data).length > 0 && data.themeId) {
-                projectData = data;
-            }
-        }
-    } catch (e) { console.error("Could not load project", e); }
-    try { history.replaceState({ step: 'home', data: JSON.parse(JSON.stringify(projectData)) }, ""); } catch (e) { }
+    // Load from localStorage first (primary – works on Vercel too)
+    const saved = localStorage.getItem('devory_project');
+    if (saved) {
+        try {
+            const parsed = JSON.parse(saved);
+            if (parsed && parsed.themeId) projectData = parsed;
+        } catch (e) { console.error('Could not parse saved project', e); }
+    }
+    try { history.replaceState({ step: 'home', data: JSON.parse(JSON.stringify(projectData)) }, ''); } catch (e) { }
 }
 
 // ==== BULLETPROOF ROUTING ENGINE ====
@@ -459,18 +458,17 @@ function showToast(msg) {
 }
 
 async function saveProject() {
+    // Save to localStorage (works everywhere including Vercel)
+    localStorage.setItem('devory_project', JSON.stringify(projectData));
+    // Also notify the API endpoint (no-op on Vercel, persists on local Express)
     try {
-        const res = await fetch('http://localhost:3000/api/projects', {
+        await fetch('/api/projects', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(projectData)
         });
-        if (res.ok) {
-            showToast('Draft Saved to Backend!');
-        } else {
-            showToast('Error saving project');
-        }
-    } catch (e) { console.error(e); showToast('Error saving project'); }
+    } catch (e) { /* backend may not be running, localStorage is the fallback */ }
+    showToast('Draft Saved!');
 }
 
 function getFinalHTML() {

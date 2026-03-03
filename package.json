@@ -1,15 +1,15 @@
 {
-  "name": "internship",
+  "name": "devory-landing-builder",
   "version": "1.0.0",
-  "description": "",
-  "main": "script.js",
+  "description": "Devory Landing Builder - Build and export landing pages fast",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Tanaka Muvezwa",
   "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
     "body-parser": "^2.2.2",
     "cors": "^2.8.6",
