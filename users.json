@@ -6,5 +6,13 @@
     "password": "admin",
     "role": "admin",
     "plan": "Admin"
+  },
+  {
+    "id": 1773689305682,
+    "name": "aa",
+    "email": "aa@gmail.com",
+    "password": "aa",
+    "role": "user",
+    "plan": "Pro Builder"
   }
 ]

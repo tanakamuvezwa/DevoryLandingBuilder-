@@ -11,7 +11,8 @@ let projectData = {
     category: '', themeId: '',
     title: '', subtitle: '', color: '',
     logoUrl: '', whatsapp: '', email: '', address: '', formspreeId: '',
-    font: '', titleColor: '', subtitleColor: '', textColor: '#1e293b', heroBgType: 'solid', gradientColor2: '#8b5cf6',
+    font: '', titleFont: '', subtitleFont: '', bodyFont: '',
+    titleColor: '', subtitleColor: '', textColor: '#1e293b', heroBgType: 'solid', gradientColor2: '#8b5cf6',
     showServices: true, servicesTitle: '',
     s1Title: '', s1Desc: '', s2Title: '', s2Desc: '', s3Title: '', s3Desc: '',
     showTestimonials: true, showFaq: true, showMap: true,
@@ -99,49 +100,49 @@ const catLogoConfig = {
 // ==== THEME ENGINE (5 Distinct Designs) ====
 const themeSystems = {
     SoftMinimal: {
-        name: "Soft Minimal", desc: "Clean layout, soft corners.", color: "#0ea5e9",
-        font: "font-['Inter']", title: "font-extrabold tracking-tight text-slate-900", general: "text-slate-800",
-        btnMain: "rounded-xl font-bold shadow-md border-0",
-        btnWa: "rounded-xl font-bold shadow-sm border border-slate-200 bg-white text-slate-700",
-        card: "rounded-2xl border border-slate-100 shadow-sm bg-white",
-        hero: "bg-slate-50 border-b border-slate-100",
-        canvasWrapper: "rounded-2xl border-0"
+        name: "Soft Minimal", desc: "Clean glass-morphism layout, soft shadows.", color: "#0ea5e9",
+        font: "font-['DM_Sans']", title: "font-extrabold tracking-tight text-slate-900", general: "text-slate-700",
+        btnMain: "rounded-2xl font-bold shadow-lg border-0",
+        btnWa: "rounded-2xl font-bold shadow-sm border border-slate-200 bg-white/80 text-slate-700 backdrop-blur-sm",
+        card: "rounded-2xl border border-slate-100 shadow-lg bg-white hover:shadow-xl hover:-translate-y-1 transition-all",
+        hero: "bg-gradient-to-br from-sky-50 via-white to-indigo-50 border-b border-sky-100",
+        canvasWrapper: "rounded-3xl shadow-2xl border border-white"
     },
     Brutalist: {
-        name: "Brutalist Impact", desc: "Sharp edges, heavy borders.", color: "#e11d48",
+        name: "Brutalist Impact", desc: "Raw, high-contrast, bold statement design.", color: "#e11d48",
         font: "font-['Montserrat']", title: "font-black uppercase tracking-tighter text-black", general: "text-black",
-        btnMain: "rounded-none font-black uppercase tracking-widest border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]",
-        btnWa: "rounded-none font-black uppercase tracking-widest border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white text-black",
-        card: "rounded-none border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] bg-white",
+        btnMain: "rounded-none font-black uppercase tracking-widest border-3 border-black shadow-[5px_5px_0px_0px_rgba(0,0,0,1)]",
+        btnWa: "rounded-none font-black uppercase tracking-widest border-3 border-black shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] bg-white text-black",
+        card: "rounded-none border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-white hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all",
         hero: "bg-white border-b-4 border-black",
-        canvasWrapper: "rounded-none border-4 border-black"
+        canvasWrapper: "rounded-none border-4 border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]"
     },
     Elegant: {
-        name: "Elegant Serif", desc: "Refined luxury, serif font.", color: "#d97706",
-        font: "font-['Playfair_Display']", title: "font-bold tracking-wide text-stone-900", general: "text-stone-800",
-        btnMain: "rounded-none font-semibold uppercase tracking-widest text-sm shadow-md",
-        btnWa: "rounded-none font-semibold uppercase tracking-widest text-sm shadow-sm border border-stone-300 bg-stone-50 text-stone-800",
-        card: "rounded-none border border-stone-200 shadow-sm bg-stone-50",
-        hero: "bg-stone-100 border-b border-stone-200",
-        canvasWrapper: "rounded-none border border-stone-300"
+        name: "Elegant Serif", desc: "Refined luxury with warm tones and serif typography.", color: "#b45309",
+        font: "font-['Playfair_Display']", title: "font-bold tracking-wide text-stone-900", general: "text-stone-700",
+        btnMain: "rounded font-semibold uppercase tracking-widest text-sm shadow-md",
+        btnWa: "rounded font-semibold uppercase tracking-widest text-sm shadow-sm border border-amber-200 bg-amber-50 text-amber-900",
+        card: "rounded border border-amber-100 shadow-md bg-gradient-to-b from-white to-amber-50 hover:shadow-lg transition-shadow",
+        hero: "bg-gradient-to-br from-stone-100 via-amber-50 to-stone-100 border-b border-amber-200",
+        canvasWrapper: "rounded-sm border border-stone-300 shadow-xl"
     },
     VibrantModern: {
-        name: "Vibrant Modern", desc: "Floating elements, pill buttons.", color: "#8b5cf6",
-        font: "font-['Poppins']", title: "font-extrabold tracking-tight text-slate-900", general: "text-slate-800",
-        btnMain: "rounded-full font-bold shadow-xl shadow-current/30 border-0",
-        btnWa: "rounded-full font-bold shadow-md border border-slate-100 bg-white text-slate-800",
-        card: "rounded-3xl border border-slate-100 shadow-xl bg-white",
-        hero: "bg-slate-50 border-b border-slate-100",
-        canvasWrapper: "rounded-[2rem] border-0"
+        name: "Vibrant Modern", desc: "Bold gradients, pill buttons, ultra-modern feel.", color: "#7c3aed",
+        font: "font-['Poppins']", title: "font-extrabold tracking-tight text-slate-900", general: "text-slate-700",
+        btnMain: "rounded-full font-extrabold shadow-2xl border-0",
+        btnWa: "rounded-full font-bold shadow-lg border border-purple-100 bg-white text-slate-800",
+        card: "rounded-3xl border border-purple-50 shadow-xl bg-white hover:shadow-2xl hover:-translate-y-2 transition-all",
+        hero: "bg-gradient-to-br from-violet-50 via-purple-50 to-fuchsia-50 border-b border-purple-100",
+        canvasWrapper: "rounded-[2rem] shadow-2xl border border-purple-50"
     },
     CorporatePro: {
-        name: "Corporate Pro", desc: "Standard professional layout.", color: "#1d4ed8",
-        font: "font-['Roboto']", title: "font-bold text-gray-800", general: "text-gray-700",
-        btnMain: "rounded font-medium shadow-sm border-0",
-        btnWa: "rounded font-medium shadow-sm border border-gray-300 bg-white text-gray-800",
-        card: "rounded border border-gray-200 shadow bg-white",
-        hero: "bg-gray-100 border-b border-gray-300",
-        canvasWrapper: "rounded-lg border border-gray-200"
+        name: "Corporate Pro", desc: "Authoritative, trust-building professional layout.", color: "#1e40af",
+        font: "font-['Space_Grotesk']", title: "font-bold text-slate-900 tracking-tight", general: "text-slate-600",
+        btnMain: "rounded-lg font-bold shadow-md border-0",
+        btnWa: "rounded-lg font-bold shadow-sm border-2 border-slate-200 bg-white text-slate-800",
+        card: "rounded-xl border border-slate-200 shadow-md bg-white hover:shadow-lg hover:border-blue-200 transition-all",
+        hero: "bg-gradient-to-r from-slate-50 via-blue-50 to-slate-50 border-b-2 border-slate-200",
+        canvasWrapper: "rounded-2xl border border-slate-200 shadow-2xl"
     }
 };
 
@@ -320,6 +321,10 @@ function logout() {
 
 // ==== ADMIN SPECIFIC LOGIC ====
 function openAdminLogin() {
+    if (currentUser && currentUser.role === 'admin') {
+        showAdminDashboard();
+        return;
+    }
     document.getElementById('admin-auth-modal').classList.remove('hidden');
 }
 
@@ -435,16 +440,17 @@ async function showAdminDashboard() {
         adminUsersList = users;
         const tbody = document.getElementById('admin-users-list');
         if(tbody) {
+            const planColors = { 'Admin': 'bg-purple-100 text-purple-700', 'Agency': 'bg-emerald-100 text-emerald-700', 'Pro Builder': 'bg-blue-100 text-blue-700', 'Starter': 'bg-slate-100 text-slate-600' };
             tbody.innerHTML = users.map(u => `
-                <tr class="hover:bg-slate-50">
-                    <td class="p-4 text-slate-900 font-medium">${u.name}</td>
-                    <td class="p-4 text-slate-600">${u.email}</td>
-                    <td class="p-4 font-mono text-sm text-indigo-600">${u.password}</td>
-                    <td class="p-4"><span class="px-2 py-1 bg-slate-100 rounded text-xs font-bold text-slate-600">${u.plan || 'Starter'}</span></td>
-                    <td class="p-4 text-sm text-slate-500 capitalize">${u.role}</td>
-                    <td class="p-4 text-right">
-                        <button onclick="openUserModal('${u.id}')" class="text-indigo-600 hover:text-indigo-800 font-semibold text-sm mr-3">Edit</button>
-                        <button onclick="deleteAdminUser('${u.id}')" ${String(u.id) === '1' ? 'disabled' : ''} class="${String(u.id) === '1' ? 'text-slate-300 cursor-not-allowed' : 'text-red-500 hover:text-red-700'} font-semibold text-sm">Delete</button>
+                <tr class="hover:bg-indigo-50/30 transition-colors">
+                    <td class="px-6 py-4 text-slate-900 font-semibold">${u.name}</td>
+                    <td class="px-6 py-4 text-slate-500 text-sm">${u.email}</td>
+                    <td class="px-6 py-4"><code class="font-mono text-xs bg-slate-100 text-indigo-600 px-2 py-1 rounded">${u.password}</code></td>
+                    <td class="px-6 py-4"><span class="px-2.5 py-1 rounded-full text-xs font-bold ${planColors[u.plan] || 'bg-slate-100 text-slate-600'}">${u.plan || 'Starter'}</span></td>
+                    <td class="px-6 py-4"><span class="text-xs font-bold ${u.role === 'admin' ? 'text-purple-600' : 'text-slate-500'} capitalize">${u.role}</span></td>
+                    <td class="px-6 py-4 text-right">
+                        <button onclick="openUserModal('${u.id}')" class="text-indigo-600 hover:text-indigo-800 font-bold text-xs bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors mr-2">Edit</button>
+                        <button onclick="deleteAdminUser('${u.id}')" ${String(u.id) === '1' ? 'disabled' : ''} class="${String(u.id) === '1' ? 'text-slate-300 cursor-not-allowed bg-slate-50' : 'text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100'} font-bold text-xs px-3 py-1.5 rounded-lg transition-colors">Delete</button>
                     </td>
                 </tr>
             `).join('');
@@ -635,9 +641,13 @@ function selectTheme(themeId) {
     projectData.email = `info@${projectData.category.toLowerCase()}brand.com`;
     projectData.address = `123 Main St, Central District`;
 
-    // Font from theme
+    // Font from theme — set all per-part fonts to the theme default
     const fontMatch = themeDef.font.match(/\['(.+?)'\]/);
-    projectData.font = fontMatch ? fontMatch[1].replace(/_/g, ' ') : 'Inter';
+    const themeFont = fontMatch ? fontMatch[1].replace(/_/g, ' ') : 'Inter';
+    projectData.font = themeFont;
+    projectData.titleFont = themeFont;
+    projectData.subtitleFont = themeFont;
+    projectData.bodyFont = themeFont;
 
     // Hero style reset
     projectData.heroBgType = 'solid';
@@ -790,11 +800,24 @@ function setupListeners() {
 
 // ==== FONT & GRADIENT HELPERS ====
 function renderFontSelector() {
-    const container = document.getElementById('font-selector');
+    renderPartFontSelector('title');
+    renderPartFontSelector('subtitle');
+    renderPartFontSelector('body');
+}
+
+function renderPartFontSelector(part) {
+    const container = document.getElementById(`font-sel-${part}`);
     if (!container) return;
-    container.innerHTML = `<div class="grid grid-cols-2 gap-1.5 w-full">${fontOptions.map(f =>
-        `<button class="font-btn ${projectData.font === f ? 'active' : ''}" style="font-family:'${f}',sans-serif" onclick="selectFont('${f}')">${f}</button>`
+    const currentFont = projectData[`${part}Font`] || projectData.font || '';
+    container.innerHTML = `<div class="grid grid-cols-2 gap-1">${fontOptions.map(f =>
+        `<button class="font-btn text-xs py-1.5 px-2 ${currentFont === f ? 'active' : ''}" style="font-family:'${f}',sans-serif" onclick="selectPartFont('${part}','${f}')">${f}</button>`
     ).join('')}</div>`;
+}
+
+function selectPartFont(part, fontName) {
+    projectData[`${part}Font`] = fontName;
+    renderPartFontSelector(part);
+    updatePreview();
 }
 
 function selectFont(fontName) {
@@ -854,20 +877,28 @@ function updatePreview() {
     const activeTheme = themeSystems[projectData.themeId];
     if (!activeTheme) return;
 
-    // Build font class from projectData.font (user override) or theme default
-    const fontClass = projectData.font
-        ? `font-['${projectData.font.replace(/ /g, '_')}']`
-        : activeTheme.font;
+    // Resolve per-part fonts with cascading fallbacks
+    const themeFontMatch = activeTheme.font.match(/\['(.+?)'\]/);
+    const themeFontName = themeFontMatch ? themeFontMatch[1].replace(/_/g, ' ') : 'Inter';
+    const bodyFontName = projectData.bodyFont || projectData.font || themeFontName;
+    const titleFontName = projectData.titleFont || bodyFontName;
+    const subtitleFontName = projectData.subtitleFont || bodyFontName;
+
+    // Apply body font to canvas (base for all elements)
+    const bodyFontClass = `font-['${bodyFontName.replace(/ /g, '_')}']`;
 
     // Apply strict structural design classes
     const canvas = document.getElementById('live-preview-canvas');
-    if (canvas) canvas.className = `bg-white w-full max-w-5xl mx-auto shadow-2xl overflow-hidden flex flex-col transition-all mb-10 ${fontClass} ${activeTheme.canvasWrapper} ${activeTheme.general}`;
+    if (canvas) canvas.className = `bg-white w-full max-w-5xl mx-auto shadow-2xl overflow-hidden flex flex-col transition-all mb-10 ${bodyFontClass} ${activeTheme.canvasWrapper} ${activeTheme.general}`;
 
     const heroBg = document.getElementById('preview-hero-bg');
     if (heroBg) heroBg.className = `dynamic-light-bg px-8 py-32 text-center flex flex-col justify-center items-center transition-all ${activeTheme.hero}`;
 
     const title = document.getElementById('preview-title');
-    if (title) title.className = `text-6xl mb-6 leading-tight max-w-4xl transition-all ${activeTheme.title}`;
+    if (title) {
+        title.className = `text-6xl mb-6 leading-tight max-w-4xl transition-all ${activeTheme.title}`;
+        title.style.fontFamily = `'${titleFontName}', sans-serif`;
+    }
 
     const srvTitle = document.getElementById('preview-services-title');
     if (srvTitle) srvTitle.className = `text-4xl mb-12 ${activeTheme.title}`;
@@ -982,7 +1013,10 @@ function updatePreview() {
     const titleEl = document.getElementById('preview-title');
     if (titleEl) titleEl.style.color = projectData.titleColor || '#0f172a';
     const subtitleEl = document.getElementById('preview-subtitle');
-    if (subtitleEl) subtitleEl.style.color = projectData.subtitleColor || '#64748b';
+    if (subtitleEl) {
+        subtitleEl.style.color = projectData.subtitleColor || '#64748b';
+        subtitleEl.style.fontFamily = `'${subtitleFontName}', sans-serif`;
+    }
 
     // Logo placeholder — icon uses category SVG, color and name sync with primary color + title
     const logoImg = document.getElementById('preview-logo-img');
@@ -1065,7 +1099,9 @@ function updateInputs() {
     setVal('input-f2-q', projectData.f2Q || '');
     setVal('input-f2-a', projectData.f2A || '');
 
-    renderFontSelector();
+    renderPartFontSelector('title');
+    renderPartFontSelector('subtitle');
+    renderPartFontSelector('body');
     renderGradientPresets();
     updateHeroBgUI();
 }
