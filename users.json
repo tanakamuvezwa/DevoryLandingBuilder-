@@ -1,0 +1,10 @@
+[
+  {
+    "id": 1,
+    "name": "Administrator",
+    "email": "admin@devory.com",
+    "password": "admin",
+    "role": "admin",
+    "plan": "Admin"
+  }
+]

@@ -7,21 +7,220 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Montserrat:ital,wght@0,700;0,900;1,900&family=Playfair+Display:wght@400;600;700&family=Poppins:wght@400;600;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Montserrat:ital,wght@0,700;0,900;1,900&family=Playfair+Display:wght@400;600;700&family=Poppins:wght@400;600;800&family=Roboto:wght@400;500;700&family=Raleway:wght@400;600;800&family=Nunito:wght@400;600;800&family=Lato:wght@400;700&family=Oswald:wght@400;600&family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; }
+
+        /* Scrollbars */
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        @keyframes slideIn { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .toast-enter { animation: slideIn 0.3s ease-out forwards; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         .hide-scroll::-webkit-scrollbar { display: none; }
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Animations */
+        @keyframes slideDown { from { transform: translateY(-12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes blobFloat { 0%,100% { transform: translate(0,0) scale(1); } 33% { transform: translate(30px,-20px) scale(1.05); } 66% { transform: translate(-20px,15px) scale(0.97); } }
+        @keyframes gradientShift { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+        .toast-enter { animation: slideDown 0.3s ease-out forwards; }
+        .blob { animation: blobFloat 12s ease-in-out infinite; }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+
+        /* FAQ details */
         details > summary { list-style: none; }
         details > summary::-webkit-details-marker { display: none; }
+
+        /* Custom Toggle Switch */
+        .toggle-wrap { position: relative; display: inline-block; width: 42px; height: 23px; flex-shrink: 0; }
+        .toggle-wrap input { opacity: 0; width: 0; height: 0; }
+        .toggle-track { position: absolute; cursor: pointer; inset: 0; background: #cbd5e1; border-radius: 23px; transition: 0.25s; }
+        .toggle-track:before { content: ''; position: absolute; height: 17px; width: 17px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.25s; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+        input:checked + .toggle-track { background: #6366f1; }
+        input:checked + .toggle-track:before { transform: translateX(19px); }
+
+        /* Font Buttons */
+        .font-btn { transition: all 0.15s; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 7px 13px; font-size: 13px; cursor: pointer; background: white; color: #334155; font-weight: 600; line-height: 1.4; white-space: nowrap; }
+        .font-btn:hover { border-color: #818cf8; background: #f0f4ff; box-shadow: 0 2px 8px rgba(99,102,241,0.12); transform: translateY(-1px); }
+        .font-btn.active { border-color: #6366f1; background: linear-gradient(135deg,#eef2ff,#e0e7ff); color: #4338ca; box-shadow: 0 2px 10px rgba(99,102,241,0.2); }
+
+        /* Gradient Swatches */
+        .grad-swatch { width: 32px; height: 32px; border-radius: 8px; cursor: pointer; border: 2px solid transparent; transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s; display: inline-block; }
+        .grad-swatch:hover { transform: scale(1.18); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .grad-swatch.active { border-color: #6366f1; transform: scale(1.12); box-shadow: 0 0 0 3px rgba(99,102,241,0.25); }
+
+        /* Hero Type Buttons */
+        .hero-type-btn { flex: 1; padding: 8px 0; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; border: 1.5px solid #e2e8f0; background: white; color: #64748b; transition: all 0.15s; letter-spacing: 0.02em; }
+        .hero-type-btn.active { background: linear-gradient(135deg,#6366f1,#8b5cf6); color: white; border-color: transparent; box-shadow: 0 4px 12px rgba(99,102,241,0.3); }
+
+        /* Section Badges */
+        .section-badge { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: linear-gradient(135deg,#6366f1,#8b5cf6); color: white; font-size: 9px; font-weight: 800; margin-right: 8px; flex-shrink: 0; box-shadow: 0 2px 6px rgba(99,102,241,0.3); }
+
+        /* Editor Cards */
+        .editor-card { background: #f8fafc; border: 1px solid #e8edf5; border-radius: 12px; padding: 12px 14px; }
+        .editor-card:hover { border-color: #c7d2fe; background: #f5f7ff; }
+
+        /* Editor Input */
+        .editor-input { border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 9px 12px; font-size: 13px; width: 100%; outline: none; transition: border-color 0.15s, box-shadow 0.15s; background: white; color: #1e293b; }
+        .editor-input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.08); }
+
+        /* Field Label */
+        .field-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #64748b; margin-bottom: 6px; display: block; }
+
+        /* Sidebar section header */
+        .sidebar-section { border-radius: 12px; overflow: hidden; }
+        .sidebar-section-hdr { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-radius: 12px; cursor: pointer; transition: background 0.15s; }
+        .sidebar-section-hdr:hover { background: #f1f5f9; }
+        .sidebar-section-hdr h4 { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em; color: #475569; display: flex; align-items: center; }
+        .sidebar-section-body { padding: 4px 2px 10px; }
+        .chevron { transition: transform 0.2s; color: #94a3b8; font-size: 10px; }
+        .chevron.open { transform: rotate(180deg); }
+
+        /* Logo upload area */
+        .logo-upload-area { border: 2px dashed #c7d2fe; border-radius: 12px; padding: 16px; text-align: center; cursor: pointer; transition: all 0.2s; background: #f8f9ff; position: relative; }
+        .logo-upload-area:hover { border-color: #6366f1; background: #eef2ff; }
+        .logo-upload-area input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+        /* Canvas area background */
+        .canvas-bg { background-color: #dde1e9; background-image: radial-gradient(circle, #c5c9d3 1px, transparent 1px); background-size: 24px 24px; }
+
+        /* Placeholder logo styles */
+        .preview-logo-placeholder { display: flex; align-items: center; gap: 8px; }
+        .preview-logo-placeholder .logo-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+        .preview-logo-placeholder .logo-name { font-size: 18px; font-weight: 800; letter-spacing: -0.03em; }
+
+        /* Step indicator */
+        .step-indicator { display: flex; align-items: center; gap: 8px; justify-content: center; margin-bottom: 32px; }
+        .step-dot { width: 8px; height: 8px; border-radius: 50%; background: #e2e8f0; transition: all 0.3s; }
+        .step-dot.active { background: #6366f1; width: 24px; border-radius: 4px; }
+        .step-dot.done { background: #22c55e; }
+
+        /* Color input group */
+        .color-input-group { display: flex; align-items: center; gap: 8px; }
+        .color-swatch-btn { width: 40px; height: 38px; border-radius: 10px; cursor: pointer; border: 2px solid rgba(0,0,0,0.08); padding: 2px; flex-shrink: 0; appearance: none; -webkit-appearance: none; }
+        .color-swatch-btn::-webkit-color-swatch-wrapper { padding: 0; }
+        .color-swatch-btn::-webkit-color-swatch { border: none; border-radius: 7px; }
+
+        /* Category card */
+        .cat-card { border-radius: 20px; padding: 32px 24px; cursor: pointer; transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1); border: 2px solid transparent; text-align: center; }
+        .cat-card:hover { transform: translateY(-6px) scale(1.01); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        .cat-card:active { transform: scale(0.98); }
+
+        /* Theme card */
+        .theme-card { border-radius: 16px; overflow: hidden; cursor: pointer; transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); border: 2px solid #e2e8f0; }
+        .theme-card:hover { transform: translateY(-8px); box-shadow: 0 24px 48px rgba(0,0,0,0.12); border-color: #6366f1; }
+
+        /* Feature card */
+        .feature-card { background: white; border: 1px solid #e2e8f0; border-radius: 20px; padding: 28px; transition: all 0.2s; }
+        .feature-card:hover { border-color: #c7d2fe; box-shadow: 0 8px 24px rgba(99,102,241,0.08); transform: translateY(-2px); }
+
+        /* Pricing card */
+        .price-card { border-radius: 24px; padding: 32px; transition: transform 0.2s; }
+        .price-card:hover { transform: translateY(-4px); }
+
+        /* Badge pill */
+        .badge-pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px; border-radius: 999px; font-size: 13px; font-weight: 700; }
+
+        /* Sidebar width */
+        #view-editor aside { width: 340px; }
+
+        /* Export button */
+        .export-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s; }
     </style>
 </head>
 <body class="bg-slate-50 h-screen overflow-hidden text-slate-800 flex flex-col">
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full relative shadow-2xl">
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h2 id="auth-title" class="text-2xl font-bold mb-6 text-slate-900">Sign Up</h2>
+            <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-4">
+                <div id="auth-name-group">
+                    <label class="block text-sm font-medium mb-1 text-slate-700">Full Name</label>
+                    <input type="text" id="auth-name" class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1 text-slate-700">Email</label>
+                    <input type="email" id="auth-email" required class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 outline-none">
+                </div>
+                <div id="auth-password-group" class="hidden">
+                    <label class="block text-sm font-medium mb-1 text-slate-700">Password</label>
+                    <input type="password" id="auth-password" class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 outline-none">
+                </div>
+                <input type="hidden" id="auth-plan" value="Starter">
+                <p id="auth-error" class="text-red-500 text-sm hidden"></p>
+                <button type="submit" id="auth-submit-btn" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition-colors">Complete Signup</button>
+            </form>
+            <div id="auth-toggle-container" class="mt-6 text-center text-sm text-slate-600 border-t pt-4">
+                <a href="#" onclick="toggleAuthMode()" id="auth-toggle-link" class="text-indigo-600 hover:underline font-semibold">Already have an account? Log in</a>
+            </div>
+            <div id="auth-generated-creds" class="hidden mt-4 p-5 bg-emerald-50 text-emerald-900 rounded-xl border border-emerald-200">
+                <div class="flex items-center gap-2 mb-3 text-emerald-700"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><p class="font-bold">Account Created!</p></div>
+                <p class="text-sm mb-1">Please save your credentials:</p>
+                <div class="bg-white p-3 rounded border border-emerald-100 font-mono text-sm mb-4">
+                    <p>Email: <span id="gen-email" class="font-bold"></span></p>
+                    <p>Password: <span id="gen-password" class="font-bold text-indigo-600"></span></p>
+                </div>
+                <button onclick="closeAuthModalAndStart()" class="w-full bg-emerald-600 text-white py-3 rounded-lg font-bold hover:bg-emerald-700 transition-colors">Start Building</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div id="admin-auth-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[60] flex items-center justify-center">
+        <div class="bg-white rounded-2xl p-8 max-w-sm w-full relative shadow-2xl border border-slate-200">
+            <button onclick="closeAdminLogin()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <div class="w-12 h-12 bg-slate-900 text-white rounded-xl flex items-center justify-center mb-6"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg></div>
+            <h2 class="text-2xl font-bold mb-2 text-slate-900">Admin Portal</h2>
+            <p class="text-sm text-slate-500 mb-6">Restricted access area.</p>
+            <form id="admin-login-form" onsubmit="handleAdminLogin(event)" class="space-y-4">
+                <div><label class="block text-sm font-medium mb-1 text-slate-700">Admin Email</label><input type="email" id="admin-login-email" required class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 outline-none"></div>
+                <div><label class="block text-sm font-medium mb-1 text-slate-700">Password</label><input type="password" id="admin-login-password" required class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 outline-none"></div>
+                <p id="admin-login-error" class="text-red-500 text-sm hidden"></p>
+                <button type="submit" class="w-full bg-slate-900 text-white py-3 rounded-xl font-bold hover:bg-slate-800 transition-colors">Login to Dashboard</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin User Edit/Create Modal -->
+    <div id="admin-user-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[60] flex items-center justify-center">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full relative shadow-2xl">
+            <button onclick="closeUserModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h2 id="admin-user-modal-title" class="text-2xl font-bold mb-6 text-slate-900">Add User</h2>
+            <form id="admin-user-form" onsubmit="saveAdminUser(event)" class="space-y-4">
+                <div><label class="block text-sm font-medium mb-1 text-slate-700">Full Name</label><input type="text" id="admin-user-name" required class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 outline-none"></div>
+                <div><label class="block text-sm font-medium mb-1 text-slate-700">Email</label><input type="email" id="admin-user-email" required class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 outline-none"></div>
+                <div><label class="block text-sm font-medium mb-1 text-slate-700">Password</label><input type="text" id="admin-user-password" required class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 outline-none font-mono text-sm"></div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1 text-slate-700">Plan</label>
+                        <select id="admin-user-plan" class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 outline-none bg-white">
+                            <option value="Starter">Starter</option><option value="Pro Builder">Pro Builder</option><option value="Agency">Agency</option><option value="Admin">Admin</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1 text-slate-700">Role</label>
+                        <select id="admin-user-role" class="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 outline-none bg-white">
+                            <option value="user">User</option><option value="admin">Admin</option>
+                        </select>
+                    </div>
+                </div>
+                <p id="admin-user-error" class="text-red-500 text-sm hidden"></p>
+                <div class="pt-4 border-t border-slate-100 flex gap-3">
+                    <button type="button" onclick="closeUserModal()" class="flex-1 bg-slate-100 text-slate-700 py-3 rounded-xl font-bold hover:bg-slate-200 transition-colors">Cancel</button>
+                    <button type="submit" class="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition-colors">Save User</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <div id="toast-container" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 hidden">
         <div class="bg-emerald-500 text-white px-6 py-3 rounded-full shadow-lg font-medium flex items-center gap-2">
@@ -30,64 +229,136 @@
         </div>
     </div>
 
-    <header class="bg-white/80 backdrop-blur-md shadow-sm border-b h-16 flex items-center justify-between px-8 z-30 shrink-0 sticky top-0">
-        <div class="flex items-center gap-2 cursor-pointer group" onclick="goToHomeSection('top')">
-            <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold group-hover:bg-indigo-700 transition-colors">D</div>
-            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Devory Builder</h1>
+    <header class="bg-white/90 backdrop-blur-xl shadow-sm border-b border-slate-100 h-14 flex items-center justify-between px-6 z-30 shrink-0 sticky top-0">
+        <div class="flex items-center gap-2.5 cursor-pointer group" onclick="goToHomeSection('top')">
+            <div class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-black text-sm shadow-md group-hover:shadow-indigo-300 transition-all">D</div>
+            <h1 class="text-lg font-black text-slate-900 tracking-tight">Devory <span class="text-indigo-600">Builder</span></h1>
         </div>
-        
-        <div class="flex items-center gap-6">
-            <div class="hidden md:flex items-center gap-8 font-medium text-sm text-slate-600" id="nav-marketing-links">
+
+        <div class="flex items-center gap-4">
+            <div class="hidden md:flex items-center gap-7 font-semibold text-sm text-slate-500" id="nav-marketing-links">
                 <a href="#features" onclick="goToHomeSection('features')" class="hover:text-indigo-600 transition-colors">Features</a>
                 <a href="#testimonials" onclick="goToHomeSection('testimonials')" class="hover:text-indigo-600 transition-colors">Reviews</a>
                 <a href="#pricing" onclick="goToHomeSection('pricing')" class="hover:text-indigo-600 transition-colors">Pricing</a>
                 <a href="#faq" onclick="goToHomeSection('faq')" class="hover:text-indigo-600 transition-colors">FAQ</a>
             </div>
 
-            <div class="h-6 w-px bg-slate-200 hidden md:block"></div>
+            <div class="h-5 w-px bg-slate-200 hidden md:block"></div>
 
-            <div class="flex items-center gap-3">
-                <button id="nav-start-btn" onclick="startBuilding()" class="bg-slate-900 text-white px-5 py-2 rounded-lg hover:bg-indigo-600 transition-colors text-sm font-semibold shadow-md">Start Building</button>
-                <button id="nav-back-btn" class="hidden bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2" onclick="goBack()">Back</button>
-                <button id="nav-save-btn" class="hidden bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2" onclick="saveProject()">Save Draft</button>
-                <button id="nav-export-html-btn" class="hidden bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2" onclick="exportToHTML()">Export HTML</button>
-                <button id="nav-export-zip-btn" class="hidden bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2" onclick="exportToZip()">Export ZIP</button>
+            <div class="flex items-center gap-2">
+                <button id="nav-login-btn" onclick="openLoginModal()" class="text-sm font-semibold text-slate-600 hover:text-indigo-600 transition-colors px-3 py-1.5">Log In</button>
+                <span id="nav-user-name" class="hidden text-sm font-bold text-slate-800 border-r pr-3 mr-1"></span>
+                <button id="nav-manage-btn" onclick="showAdminDashboard()" class="hidden text-sm font-semibold text-indigo-600 hover:text-indigo-700 mr-2">Manage</button>
+                <button id="nav-logout-btn" onclick="logout()" class="hidden text-sm font-semibold text-red-500 hover:text-red-600 mr-2">Log Out</button>
+                <button id="nav-start-btn" onclick="startBuilding()" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-5 py-2 rounded-xl hover:opacity-90 transition-all text-sm font-bold shadow-md hover:shadow-indigo-300 hover:-translate-y-0.5">Start Building →</button>
+                <button id="nav-back-btn" class="hidden bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-semibold transition-colors flex items-center gap-1.5" onclick="goBack()">← Back</button>
+                <button id="nav-save-btn" class="hidden bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-4 py-2 rounded-xl text-sm font-semibold transition-colors" onclick="saveProject()">
+                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>Save
+                </button>
+                <button id="nav-export-html-btn" class="hidden bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-xl text-sm font-bold transition-colors" onclick="exportToHTML()">HTML ↓</button>
+                <button id="nav-export-zip-btn" class="hidden bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-90 text-white px-4 py-2 rounded-xl text-sm font-bold transition-all shadow-md" onclick="exportToZip()">
+                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>ZIP ↓
+                </button>
             </div>
         </div>
     </header>
 
     <main id="view-home" class="flex-1 overflow-y-auto custom-scrollbar bg-white">
-        <section class="max-w-7xl mx-auto px-8 pt-20 pb-24 grid lg:grid-cols-2 gap-12 items-center">
+        <section class="relative max-w-7xl mx-auto px-8 pt-20 pb-28 grid lg:grid-cols-2 gap-16 items-center overflow-hidden">
+            <!-- Background blobs -->
+            <div class="absolute top-10 right-0 w-96 h-96 bg-indigo-300/20 rounded-full blur-3xl blob pointer-events-none"></div>
+            <div class="absolute bottom-0 left-20 w-64 h-64 bg-purple-300/20 rounded-full blur-3xl blob pointer-events-none" style="animation-delay:-4s"></div>
             <div>
-                <div class="inline-block px-4 py-1.5 bg-indigo-50 text-indigo-600 font-semibold rounded-full text-sm mb-6 border border-indigo-100">🚀 Devory Builder 2.0 is Live</div>
-                <h1 class="text-5xl lg:text-6xl font-extrabold text-slate-900 leading-tight mb-6 tracking-tight">Launch High-Converting Pages in <span class="text-indigo-600">Seconds.</span></h1>
-                <p class="text-xl text-slate-500 mb-8 leading-relaxed">No coding required. Choose from professional themes, customize your brand, and download pure, blazing-fast HTML files instantly.</p>
-                <div class="flex gap-4">
-                    <button onclick="startBuilding()" class="bg-indigo-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-indigo-700 transition-all shadow-lg hover:shadow-indigo-200 flex items-center gap-2">
+                <div class="badge-pill bg-indigo-50 text-indigo-600 border border-indigo-100 mb-6 text-sm">
+                    <span class="w-2 h-2 bg-indigo-500 rounded-full animate-pulse inline-block"></span>
+                    Devory Builder 2.0 is Live
+                </div>
+                <h1 class="text-5xl lg:text-6xl font-black text-slate-900 leading-[1.08] mb-6 tracking-tight">Launch <span class="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">High-Converting</span> Pages in Seconds.</h1>
+                <p class="text-xl text-slate-500 mb-10 leading-relaxed max-w-lg">No coding required. Choose from professional themes, customize every detail, and download blazing-fast HTML instantly.</p>
+                <div class="flex flex-wrap gap-4">
+                    <button onclick="startBuilding()" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-2xl font-black text-lg hover:opacity-90 transition-all shadow-xl hover:shadow-indigo-300 hover:-translate-y-1 flex items-center gap-2">
                         Start Building Free <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
                     </button>
-                    <a href="#features" onclick="goToHomeSection('features')" class="bg-slate-100 text-slate-700 px-8 py-4 rounded-xl font-bold text-lg hover:bg-slate-200 transition-all">View Features</a>
+                    <a href="#features" onclick="goToHomeSection('features')" class="bg-white text-slate-700 px-8 py-4 rounded-2xl font-bold text-lg hover:bg-slate-50 transition-all border border-slate-200 shadow-sm">View Features</a>
+                </div>
+                <div class="flex items-center gap-8 mt-10 pt-8 border-t border-slate-100">
+                    <div><p class="text-2xl font-black text-slate-900">20+</p><p class="text-sm text-slate-500 font-medium">Theme Variants</p></div>
+                    <div class="w-px h-10 bg-slate-200"></div>
+                    <div><p class="text-2xl font-black text-slate-900">4</p><p class="text-sm text-slate-500 font-medium">Industries</p></div>
+                    <div class="w-px h-10 bg-slate-200"></div>
+                    <div><p class="text-2xl font-black text-slate-900">10+</p><p class="text-sm text-slate-500 font-medium">Font Choices</p></div>
                 </div>
             </div>
             <div class="relative">
-                <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80" alt="Dashboard" class="rounded-2xl shadow-2xl border border-slate-200 object-cover h-[450px] w-full">
-                <div class="absolute -bottom-6 -left-6 bg-white p-4 rounded-xl shadow-xl border border-slate-100 flex items-center gap-4">
-                    <div class="w-12 h-12 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg></div>
-                    <div><p class="text-xs text-slate-500 font-bold uppercase">Export Ready</p><p class="text-lg font-extrabold text-slate-900">HTML & ZIP</p></div>
+                <div class="absolute inset-0 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-3xl transform rotate-2"></div>
+                <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80" alt="Dashboard" class="relative rounded-3xl shadow-2xl border border-white/50 object-cover h-[460px] w-full">
+                <div class="absolute -bottom-5 -left-5 bg-white p-4 rounded-2xl shadow-2xl border border-slate-100 flex items-center gap-3">
+                    <div class="w-10 h-10 bg-emerald-100 text-emerald-500 rounded-xl flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    </div>
+                    <div><p class="text-xs text-slate-500 font-bold uppercase tracking-wide">Ready to Deploy</p><p class="text-sm font-black text-slate-900">HTML & ZIP Export</p></div>
+                </div>
+                <div class="absolute -top-5 -right-5 bg-white p-3 rounded-2xl shadow-xl border border-slate-100">
+                    <div class="flex gap-1">
+                        <div class="w-2.5 h-2.5 rounded-full bg-rose-400"></div>
+                        <div class="w-2.5 h-2.5 rounded-full bg-amber-400"></div>
+                        <div class="w-2.5 h-2.5 rounded-full bg-emerald-400"></div>
+                    </div>
+                    <p class="text-xs font-bold text-slate-500 mt-1.5">Live Preview</p>
                 </div>
             </div>
         </section>
 
-        <section id="features" class="bg-slate-50 py-24 border-y border-slate-200">
+        <section id="features" class="bg-gradient-to-b from-slate-50 to-white py-28 border-y border-slate-100">
             <div class="max-w-7xl mx-auto px-8">
                 <div class="text-center max-w-2xl mx-auto mb-16">
-                    <h2 class="text-4xl font-extrabold text-slate-900 mb-4">Everything You Need to Scale</h2>
-                    <p class="text-lg text-slate-600">Designed specifically for marketing agencies and freelancers who need to deploy fast, beautiful pages without touching a line of code.</p>
+                    <p class="text-indigo-600 font-bold text-sm uppercase tracking-widest mb-3">Why Choose Devory</p>
+                    <h2 class="text-4xl font-black text-slate-900 mb-4 tracking-tight">Everything to Scale Fast</h2>
+                    <p class="text-lg text-slate-500">Built for agencies and freelancers who need professional pages without writing a line of code.</p>
                 </div>
-                <div class="grid md:grid-cols-3 gap-8">
-                    <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100"><div class="w-12 h-12 bg-sky-100 text-sky-500 rounded-xl flex items-center justify-center mb-6"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg></div><h3 class="text-xl font-bold text-slate-900 mb-3">20+ Theme Variations</h3><p class="text-slate-600">Choose from 4 industries and 5 distinct design systems. Fonts, borders, and UI change instantly.</p></div>
-                    <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100"><div class="w-12 h-12 bg-green-100 text-green-500 rounded-xl flex items-center justify-center mb-6"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg></div><h3 class="text-xl font-bold text-slate-900 mb-3">WhatsApp & Forms</h3><p class="text-slate-600">Built-in integration for direct WhatsApp chat CTA and Formspree contact forms that work instantly.</p></div>
-                    <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100"><div class="w-12 h-12 bg-indigo-100 text-indigo-500 rounded-xl flex items-center justify-center mb-6"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg></div><h3 class="text-xl font-bold text-slate-900 mb-3">Instant ZIP Export</h3><p class="text-slate-600">Download your finished HTML, CSS, and JS packaged neatly in a ZIP file, ready for any web host.</p></div>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="feature-card group">
+                        <div class="w-12 h-12 bg-gradient-to-br from-sky-400 to-cyan-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-sky-200 group-hover:scale-110 transition-transform">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-black text-slate-900 mb-3">20+ Theme Variations</h3>
+                        <p class="text-slate-500 leading-relaxed">4 industries, 5 design systems. Fonts, borders, and spacing change with one click.</p>
+                    </div>
+                    <div class="feature-card group">
+                        <div class="w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-emerald-200 group-hover:scale-110 transition-transform">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-black text-slate-900 mb-3">WhatsApp & Forms</h3>
+                        <p class="text-slate-500 leading-relaxed">Direct WhatsApp CTA and Formspree contact forms built in. Customers reach you instantly.</p>
+                    </div>
+                    <div class="feature-card group">
+                        <div class="w-12 h-12 bg-gradient-to-br from-indigo-400 to-purple-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-indigo-200 group-hover:scale-110 transition-transform">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-black text-slate-900 mb-3">Instant ZIP Export</h3>
+                        <p class="text-slate-500 leading-relaxed">Download clean HTML, CSS, and JS packaged in a ZIP. Host it anywhere in seconds.</p>
+                    </div>
+                    <div class="feature-card group">
+                        <div class="w-12 h-12 bg-gradient-to-br from-rose-400 to-pink-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-rose-200 group-hover:scale-110 transition-transform">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-black text-slate-900 mb-3">Full Color & Font Control</h3>
+                        <p class="text-slate-500 leading-relaxed">Pick any primary color, gradient, body text color, and from 10+ Google Fonts — all live preview.</p>
+                    </div>
+                    <div class="feature-card group">
+                        <div class="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-amber-200 group-hover:scale-110 transition-transform">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-black text-slate-900 mb-3">Logo Upload</h3>
+                        <p class="text-slate-500 leading-relaxed">Upload your brand logo in one click. Auto-replaces placeholder art. PNG, SVG, JPG supported.</p>
+                    </div>
+                    <div class="feature-card group">
+                        <div class="w-12 h-12 bg-gradient-to-br from-violet-400 to-purple-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-violet-200 group-hover:scale-110 transition-transform">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        </div>
+                        <h3 class="text-xl font-black text-slate-900 mb-3">Hero Gradients</h3>
+                        <p class="text-slate-500 leading-relaxed">Switch between solid and gradient hero backgrounds. 10 preset gradient combos included.</p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -124,13 +395,49 @@
             </div>
         </section>
 
-        <section id="pricing" class="py-24 bg-slate-900 text-white">
-            <div class="max-w-7xl mx-auto px-8">
-                <div class="text-center max-w-2xl mx-auto mb-16"><h2 class="text-4xl font-extrabold mb-4">Simple, Transparent Pricing</h2><p class="text-slate-400 text-lg">Start building for free, upgrade when you need to scale.</p></div>
-                <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-                    <div class="bg-slate-800 p-8 rounded-3xl border border-slate-700 flex flex-col"><h3 class="text-2xl font-bold mb-2">Starter</h3><div class="text-4xl font-black mb-6">$0<span class="text-lg font-medium text-slate-400">/mo</span></div><ul class="space-y-4 mb-8 flex-1 text-slate-300"><li>✓ 1 Active Project</li><li>✓ Basic HTML Export</li></ul><button onclick="startBuilding()" class="w-full py-3 rounded-xl border-2 border-slate-600 font-bold hover:bg-slate-700 transition-colors">Start Free</button></div>
-                    <div class="bg-indigo-600 p-8 rounded-3xl shadow-2xl flex flex-col transform md:-translate-y-4"><div class="bg-indigo-500 text-white text-xs font-bold uppercase tracking-wider py-1 px-3 rounded-full self-start mb-4">Most Popular</div><h3 class="text-2xl font-bold mb-2">Pro Builder</h3><div class="text-4xl font-black mb-6">$19<span class="text-lg font-medium text-indigo-200">/mo</span></div><ul class="space-y-4 mb-8 flex-1 text-indigo-100"><li>✓ Unlimited Projects</li><li>✓ Full ZIP Export</li><li>✓ All Themes</li></ul><button onclick="startBuilding()" class="w-full py-3 bg-white text-indigo-600 rounded-xl font-bold shadow-lg hover:bg-slate-50 transition-colors">Upgrade to Pro</button></div>
-                    <div class="bg-slate-800 p-8 rounded-3xl border border-slate-700 flex flex-col"><h3 class="text-2xl font-bold mb-2">Agency</h3><div class="text-4xl font-black mb-6">$49<span class="text-lg font-medium text-slate-400">/mo</span></div><ul class="space-y-4 mb-8 flex-1 text-slate-300"><li>✓ White-label Editor</li><li>✓ Custom Domains</li></ul><button onclick="startBuilding()" class="w-full py-3 rounded-xl border-2 border-slate-600 font-bold hover:bg-slate-700 transition-colors">Contact Sales</button></div>
+        <section id="pricing" class="py-28 bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white relative overflow-hidden">
+            <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle, white 1px, transparent 1px); background-size: 32px 32px;"></div>
+            <div class="max-w-7xl mx-auto px-8 relative">
+                <div class="text-center max-w-2xl mx-auto mb-16">
+                    <p class="text-indigo-400 font-bold text-sm uppercase tracking-widest mb-3">Pricing</p>
+                    <h2 class="text-4xl font-black mb-4">Simple, Transparent Pricing</h2>
+                    <p class="text-slate-400 text-lg">Start building for free, upgrade when you need to scale.</p>
+                </div>
+                <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                    <div class="price-card bg-slate-800/80 border border-slate-700 flex flex-col">
+                        <h3 class="text-xl font-black mb-1">Starter</h3>
+                        <p class="text-slate-400 text-sm mb-6">Perfect for trying out</p>
+                        <div class="text-5xl font-black mb-8">$0<span class="text-xl font-medium text-slate-400">/mo</span></div>
+                        <ul class="space-y-3 mb-8 flex-1 text-slate-300 text-sm">
+                            <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> 1 Active Project</li>
+                            <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Basic HTML Export</li>
+                            <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> All Themes</li>
+                        </ul>
+                        <button onclick="startBuilding()" class="w-full py-3 rounded-2xl border-2 border-slate-600 font-bold hover:bg-slate-700 transition-colors text-sm">Start Free</button>
+                    </div>
+                    <div class="price-card bg-gradient-to-br from-indigo-600 to-purple-700 shadow-2xl shadow-indigo-900 flex flex-col transform md:-translate-y-4 border border-indigo-500/30">
+                        <div class="badge-pill bg-white/20 text-white text-xs mb-4 self-start">⭐ Most Popular</div>
+                        <h3 class="text-xl font-black mb-1">Pro Builder</h3>
+                        <p class="text-indigo-200 text-sm mb-6">For professionals</p>
+                        <div class="text-5xl font-black mb-8">$19<span class="text-xl font-medium text-indigo-300">/mo</span></div>
+                        <ul class="space-y-3 mb-8 flex-1 text-indigo-100 text-sm">
+                            <li class="flex items-center gap-2"><span class="text-white">✓</span> Unlimited Projects</li>
+                            <li class="flex items-center gap-2"><span class="text-white">✓</span> Full ZIP Export</li>
+                            <li class="flex items-center gap-2"><span class="text-white">✓</span> Priority Support</li>
+                        </ul>
+                        <button onclick="startBuilding()" class="w-full py-3 bg-white text-indigo-700 rounded-2xl font-black shadow-lg hover:bg-slate-50 transition-colors text-sm">Upgrade to Pro</button>
+                    </div>
+                    <div class="price-card bg-slate-800/80 border border-slate-700 flex flex-col">
+                        <h3 class="text-xl font-black mb-1">Agency</h3>
+                        <p class="text-slate-400 text-sm mb-6">For teams & agencies</p>
+                        <div class="text-5xl font-black mb-8">$49<span class="text-xl font-medium text-slate-400">/mo</span></div>
+                        <ul class="space-y-3 mb-8 flex-1 text-slate-300 text-sm">
+                            <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> White-label Editor</li>
+                            <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Custom Domains</li>
+                            <li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Team Seats</li>
+                        </ul>
+                        <button onclick="startBuilding()" class="w-full py-3 rounded-2xl border-2 border-slate-600 font-bold hover:bg-slate-700 transition-colors text-sm">Contact Sales</button>
+                    </div>
                 </div>
             </div>
         </section>
@@ -148,112 +455,380 @@
                 </div>
             </div>
         </section>
-        <footer class="bg-slate-950 text-slate-500 py-12 text-center text-sm border-t border-slate-800"><p>© 2026 Devory Tech. All Rights Reserved.</p></footer>
+        <footer class="bg-slate-950 text-slate-500 py-12 text-center text-sm border-t border-slate-800">
+            <p>© 2026 Devory Tech. All Rights Reserved. | <button onclick="openAdminLogin()" class="hover:text-slate-300 transition-colors ml-1 font-medium">Admin Portal</button></p>
+        </footer>
     </main>
 
-    <main id="view-categories" class="hidden flex-1 overflow-y-auto custom-scrollbar p-10 max-w-7xl mx-auto w-full">
-        <div class="text-center mb-16"><h2 class="text-4xl font-extrabold text-slate-900 mb-4">Step 1: Choose Industry</h2><p class="text-slate-500 text-lg">Select the category that best matches your client.</p></div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div onclick="selectCategory('Clinic')" class="bg-white rounded-2xl shadow-sm border hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer p-8 flex flex-col items-center text-center group"><div class="w-24 h-24 bg-sky-100 rounded-full flex items-center justify-center text-sky-500 mb-6 group-hover:scale-110 transition-transform"><svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg></div><h3 class="text-2xl font-bold text-slate-800 mb-2">Clinic</h3></div>
-            <div onclick="selectCategory('Fitness')" class="bg-white rounded-2xl shadow-sm border hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer p-8 flex flex-col items-center text-center group"><div class="w-24 h-24 bg-rose-100 rounded-full flex items-center justify-center text-rose-500 mb-6 group-hover:scale-110 transition-transform"><svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg></div><h3 class="text-2xl font-bold text-slate-800 mb-2">Fitness</h3></div>
-            <div onclick="selectCategory('Hotel')" class="bg-white rounded-2xl shadow-sm border hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer p-8 flex flex-col items-center text-center group"><div class="w-24 h-24 bg-amber-100 rounded-full flex items-center justify-center text-amber-500 mb-6 group-hover:scale-110 transition-transform"><svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg></div><h3 class="text-2xl font-bold text-slate-800 mb-2">Hotel</h3></div>
-            <div onclick="selectCategory('Transfer')" class="bg-white rounded-2xl shadow-sm border hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer p-8 flex flex-col items-center text-center group"><div class="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-500 mb-6 group-hover:scale-110 transition-transform"><svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg></div><h3 class="text-2xl font-bold text-slate-800 mb-2">Transfer</h3></div>
+    <main id="view-categories" class="hidden flex-1 overflow-y-auto custom-scrollbar bg-gradient-to-b from-slate-50 to-white">
+        <div class="max-w-5xl mx-auto px-8 pt-14 pb-20">
+            <div class="text-center mb-12">
+                <div class="step-indicator">
+                    <div class="step-dot active"></div>
+                    <div class="step-dot"></div>
+                    <div class="step-dot"></div>
+                </div>
+                <p class="text-indigo-600 font-bold text-sm uppercase tracking-widest mb-2">Step 1 of 3</p>
+                <h2 class="text-4xl font-black text-slate-900 mb-3 tracking-tight">Choose Your Industry</h2>
+                <p class="text-slate-500 text-lg">Pick the category that best matches your client's business.</p>
+            </div>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-5">
+                <div onclick="selectCategory('Clinic')" class="cat-card bg-gradient-to-br from-sky-50 to-cyan-50 border-sky-100 border-2 group">
+                    <div class="w-20 h-20 bg-gradient-to-br from-sky-400 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-sky-200 group-hover:scale-110 transition-transform">
+                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-900 mb-1.5">Clinic</h3>
+                    <p class="text-sm text-slate-500 font-medium">Healthcare & Medical</p>
+                </div>
+                <div onclick="selectCategory('Fitness')" class="cat-card bg-gradient-to-br from-rose-50 to-orange-50 border-rose-100 border-2 group">
+                    <div class="w-20 h-20 bg-gradient-to-br from-rose-400 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-rose-200 group-hover:scale-110 transition-transform">
+                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-900 mb-1.5">Fitness</h3>
+                    <p class="text-sm text-slate-500 font-medium">Gym & Training</p>
+                </div>
+                <div onclick="selectCategory('Hotel')" class="cat-card bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-100 border-2 group">
+                    <div class="w-20 h-20 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-amber-200 group-hover:scale-110 transition-transform">
+                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-900 mb-1.5">Hotel</h3>
+                    <p class="text-sm text-slate-500 font-medium">Hospitality & Luxury</p>
+                </div>
+                <div onclick="selectCategory('Transfer')" class="cat-card bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100 border-2 group">
+                    <div class="w-20 h-20 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-emerald-200 group-hover:scale-110 transition-transform">
+                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-900 mb-1.5">Transfer</h3>
+                    <p class="text-sm text-slate-500 font-medium">Transport & VIP</p>
+                </div>
+            </div>
         </div>
     </main>
 
-    <main id="view-themes" class="hidden flex-1 overflow-y-auto custom-scrollbar p-10 max-w-7xl mx-auto w-full">
-        <div class="text-center mb-12 relative">
-            <h2 class="text-4xl font-extrabold text-slate-900 mb-4">Step 2: Choose a Theme</h2>
-            <p id="theme-category-subtitle" class="text-indigo-600 font-bold text-lg uppercase tracking-wider">For [Category]</p>
+    <main id="view-themes" class="hidden flex-1 overflow-y-auto custom-scrollbar bg-gradient-to-b from-slate-50 to-white">
+        <div class="max-w-6xl mx-auto px-8 pt-14 pb-20">
+            <div class="text-center mb-12">
+                <div class="step-indicator">
+                    <div class="step-dot done"></div>
+                    <div class="step-dot active"></div>
+                    <div class="step-dot"></div>
+                </div>
+                <p class="text-indigo-600 font-bold text-sm uppercase tracking-widest mb-2">Step 2 of 3</p>
+                <h2 class="text-4xl font-black text-slate-900 mb-3 tracking-tight">Pick a Design Theme</h2>
+                <p id="theme-category-subtitle" class="text-indigo-600 font-bold text-base">For [Category] Industry</p>
+            </div>
+            <div id="theme-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-20"></div>
         </div>
-        <div id="theme-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-20"></div>
+    </main>
+
+    <!-- Admin Dashboard View -->
+    <main id="view-admin" class="hidden flex-1 overflow-y-auto custom-scrollbar p-10 max-w-7xl mx-auto w-full">
+        <div class="flex justify-between items-end mb-12 relative border-b pb-6">
+            <div>
+                <h2 class="text-4xl font-extrabold text-slate-900 mb-2">Admin Dashboard</h2>
+                <p class="text-slate-500 text-lg">Manage all user credentials and plans.</p>
+            </div>
+            <button onclick="openUserModal()" class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-colors shadow-md flex items-center gap-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg> Add New User</button>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-slate-50 border-b border-slate-200">
+                    <tr>
+                        <th class="p-4 font-bold text-slate-700">Name</th>
+                        <th class="p-4 font-bold text-slate-700">Email</th>
+                        <th class="p-4 font-bold text-slate-700">Password</th>
+                        <th class="p-4 font-bold text-slate-700">Plan</th>
+                        <th class="p-4 font-bold text-slate-700">Role</th>
+                        <th class="p-4 font-bold text-slate-700 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-users-list" class="divide-y divide-slate-100">
+                </tbody>
+            </table>
+        </div>
     </main>
 
     <main id="view-editor" class="hidden flex-1 flex overflow-hidden">
         
-        <aside class="w-96 bg-white border-r flex flex-col h-full z-10 shadow-lg shrink-0">
-            <div class="flex border-b bg-slate-50 text-sm overflow-x-auto custom-scrollbar shrink-0"><div class="flex-1 py-4 font-semibold text-indigo-600 border-b-2 border-indigo-600 flex justify-center gap-2 items-center">Edit Page</div></div>
-            <div class="p-6 overflow-y-auto flex-1 space-y-8 custom-scrollbar">
-                <section>
-                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">1. Content & Branding</h4>
-                    <div class="space-y-4">
-                        <div><label class="block text-sm font-medium text-slate-700 mb-1">Upload Brand Logo</label><input type="file" accept="image/*" id="input-logo" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm bg-slate-50 cursor-pointer"></div>
-                        <div><label class="block text-sm font-medium text-slate-700 mb-1">Hero Title</label><input type="text" id="input-title" class="w-full border border-slate-300 rounded-lg px-4 py-2 text-sm focus:ring-2 outline-none"></div>
-                        <div><label class="block text-sm font-medium text-slate-700 mb-1">Subtitle</label><textarea id="input-subtitle" rows="2" class="w-full border border-slate-300 rounded-lg px-4 py-2 text-sm focus:ring-2 outline-none"></textarea></div>
-                        <div><label class="block text-sm font-medium text-slate-700 mb-1">Primary Color</label><input type="color" id="input-color" class="w-12 h-12 rounded cursor-pointer border-0 p-0"></div>
-                    </div>
-                </section>
-                <hr class="border-slate-100">
-                <section>
-                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">2. Contact & Forms</h4>
-                    <div class="space-y-4">
-                        <div><label class="block text-sm font-medium text-slate-700 mb-1">WhatsApp Number</label><input type="text" id="input-whatsapp" placeholder="+1234567890" class="w-full border border-slate-300 rounded-lg px-4 py-2 text-sm focus:ring-2 outline-none"></div>
-                        <div><label class="block text-sm font-medium text-slate-700 mb-1">Contact Email</label><input type="email" id="input-email" placeholder="info@client.com" class="w-full border border-slate-300 rounded-lg px-4 py-2 text-sm focus:ring-2 outline-none"></div>
-                        <div><label class="block text-sm font-medium text-slate-700 mb-1">Physical Address</label><input type="text" id="input-address" placeholder="123 Main St, City" class="w-full border border-slate-300 rounded-lg px-4 py-2 text-sm focus:ring-2 outline-none"></div>
-                        <div><label class="block text-sm font-medium text-slate-700 mb-1">Formspree ID</label><input type="text" id="input-formspree" placeholder="Your formspree code" class="w-full border border-slate-300 rounded-lg px-4 py-2 text-sm focus:ring-2 outline-none"></div>
-                    </div>
-                </section>
-                <hr class="border-slate-100">
-                <section>
-                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">3. Sections & Toggles</h4>
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between">
-                            <label class="text-sm font-medium text-slate-700">Show Testimonials</label>
-                            <input type="checkbox" id="toggle-testimonials" class="cursor-pointer" checked>
+        <aside class="w-[340px] bg-white border-r border-slate-100 flex flex-col h-full z-10 shadow-xl shrink-0">
+            <!-- Sidebar Header -->
+            <div class="px-5 py-4 border-b border-slate-100 bg-gradient-to-r from-indigo-600 to-purple-600 shrink-0">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-7 h-7 bg-white/20 rounded-lg flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                         </div>
-                        <div class="flex items-center justify-between">
-                            <label class="text-sm font-medium text-slate-700">Show FAQ</label>
-                            <input type="checkbox" id="toggle-faq" class="cursor-pointer" checked>
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <label class="text-sm font-medium text-slate-700">Show Map</label>
-                            <input type="checkbox" id="toggle-map" class="cursor-pointer" checked>
-                        </div>
+                        <span class="text-white font-black text-sm tracking-wide">PAGE EDITOR</span>
                     </div>
-                </section>
-                <hr class="border-slate-100">
-                <section>
-                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">4. Testimonials</h4>
-                    <div class="space-y-4">
-                        <div><label class="block text-sm font-medium text-slate-700 mb-1">Quote 1</label><input type="text" id="input-t1-text" class="w-full border border-slate-300 rounded-lg px-4 py-2 text-sm focus:ring-2 outline-none"></div>
-                        <div><label class="block text-sm font-medium text-slate-700 mb-1">Author 1</label><input type="text" id="input-t1-author" class="w-full border border-slate-300 rounded-lg px-4 py-2 text-sm focus:ring-2 outline-none"></div>
-                        <div><label class="block text-sm font-medium text-slate-700 mb-1">Quote 2</label><input type="text" id="input-t2-text" class="w-full border border-slate-300 rounded-lg px-4 py-2 text-sm focus:ring-2 outline-none"></div>
-                        <div><label class="block text-sm font-medium text-slate-700 mb-1">Author 2</label><input type="text" id="input-t2-author" class="w-full border border-slate-300 rounded-lg px-4 py-2 text-sm focus:ring-2 outline-none"></div>
+                    <div class="step-indicator" style="margin:0">
+                        <div class="step-dot done" style="background:#86efac"></div>
+                        <div class="step-dot done" style="background:#86efac"></div>
+                        <div class="step-dot active" style="background:white;width:18px"></div>
                     </div>
-                </section>
-                <hr class="border-slate-100">
-                <section>
-                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">5. FAQ</h4>
-                    <div class="space-y-4">
-                        <div><label class="block text-sm font-medium text-slate-700 mb-1">Q1</label><input type="text" id="input-f1-q" class="w-full border border-slate-300 rounded-lg px-4 py-2 text-sm focus:ring-2 outline-none"></div>
-                        <div><label class="block text-sm font-medium text-slate-700 mb-1">A1</label><input type="text" id="input-f1-a" class="w-full border border-slate-300 rounded-lg px-4 py-2 text-sm focus:ring-2 outline-none"></div>
-                        <div><label class="block text-sm font-medium text-slate-700 mb-1">Q2</label><input type="text" id="input-f2-q" class="w-full border border-slate-300 rounded-lg px-4 py-2 text-sm focus:ring-2 outline-none"></div>
-                        <div><label class="block text-sm font-medium text-slate-700 mb-1">A2</label><input type="text" id="input-f2-a" class="w-full border border-slate-300 rounded-lg px-4 py-2 text-sm focus:ring-2 outline-none"></div>
-                    </div>
-                </section>
+                </div>
             </div>
-            
-            <div class="p-4 border-t bg-slate-50 shrink-0">
-                <button onclick="goBack()" class="w-full py-3 bg-white border border-slate-300 text-slate-700 rounded-lg font-bold text-sm hover:bg-slate-100 transition-colors flex justify-center items-center shadow-sm">
+
+            <div class="flex-1 overflow-y-auto custom-scrollbar" style="padding: 12px 10px 20px">
+
+                <!-- 1. Branding & Content -->
+                <div class="mb-1">
+                    <div class="sidebar-section-hdr" onclick="toggleSection('sec-branding')">
+                        <h4><span class="section-badge">1</span>Branding & Content</h4>
+                        <span class="chevron open" id="chev-branding">▼</span>
+                    </div>
+                    <div class="sidebar-section-body px-2" id="sec-branding">
+                        <!-- Logo Upload -->
+                        <div class="mb-3">
+                            <span class="field-label">Brand Logo</span>
+                            <div class="logo-upload-area" onclick="document.getElementById('input-logo').click()">
+                                <input type="file" accept="image/*" id="input-logo" style="display:none" onchange="handleLogoChange(event)">
+                                <div class="flex flex-col items-center gap-2 pointer-events-none">
+                                    <div class="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-bold text-indigo-600">Click to upload logo</p>
+                                        <p class="text-xs text-slate-400">PNG, SVG, JPG supported</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <span class="field-label">Hero Title</span>
+                            <input type="text" id="input-title" class="editor-input">
+                        </div>
+                        <div class="mb-3">
+                            <span class="field-label">Subtitle / Tagline</span>
+                            <textarea id="input-subtitle" rows="2" class="editor-input resize-none"></textarea>
+                        </div>
+                        <div>
+                            <span class="field-label">Font Family</span>
+                            <div id="font-selector" class="flex flex-wrap gap-1.5 mt-1"></div>
+                        </div>
+                    </div>
+                </div>
+                <hr class="border-slate-100 my-2">
+
+                <!-- 2. Colors & Style -->
+                <div class="mb-1">
+                    <div class="sidebar-section-hdr" onclick="toggleSection('sec-colors')">
+                        <h4><span class="section-badge">2</span>Colors & Style</h4>
+                        <span class="chevron open" id="chev-colors">▼</span>
+                    </div>
+                    <div class="sidebar-section-body px-2" id="sec-colors">
+                        <div class="mb-4">
+                            <span class="field-label">Primary / Accent Color</span>
+                            <div class="color-input-group">
+                                <input type="color" id="input-color" class="color-swatch-btn">
+                                <input type="text" id="input-color-hex" maxlength="7" placeholder="#4f46e5" class="editor-input font-mono text-xs uppercase">
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <span class="field-label">Hero Title Color</span>
+                            <div class="color-input-group">
+                                <input type="color" id="input-title-color" value="#0f172a" class="color-swatch-btn">
+                                <input type="text" id="input-title-color-hex" maxlength="7" placeholder="#0f172a" class="editor-input font-mono text-xs uppercase">
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <span class="field-label">Subtitle / Tagline Color</span>
+                            <div class="color-input-group">
+                                <input type="color" id="input-subtitle-color" value="#64748b" class="color-swatch-btn">
+                                <input type="text" id="input-subtitle-color-hex" maxlength="7" placeholder="#64748b" class="editor-input font-mono text-xs uppercase">
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <span class="field-label">Body Text Color</span>
+                            <div class="color-input-group">
+                                <input type="color" id="input-text-color" value="#1e293b" class="color-swatch-btn">
+                                <input type="text" id="input-text-color-hex" maxlength="7" placeholder="#1e293b" class="editor-input font-mono text-xs uppercase">
+                            </div>
+                        </div>
+                        <div>
+                            <span class="field-label">Hero Background Style</span>
+                            <div class="flex gap-2 mb-3">
+                                <button id="hero-type-solid" class="hero-type-btn active" onclick="setHeroBgType('solid')">◼ Solid Color</button>
+                                <button id="hero-type-gradient" class="hero-type-btn" onclick="setHeroBgType('gradient')">◈ Gradient</button>
+                            </div>
+                            <div id="gradient-options" class="hidden">
+                                <span class="field-label">Quick Presets</span>
+                                <div id="gradient-presets" class="flex flex-wrap gap-2 mb-3"></div>
+                                <span class="field-label">End Color</span>
+                                <div class="color-input-group">
+                                    <input type="color" id="input-gradient-color2" value="#8b5cf6" class="color-swatch-btn">
+                                    <span class="text-xs text-slate-400 ml-1">Primary → End Color</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr class="border-slate-100 my-2">
+
+                <!-- 3. Services -->
+                <div class="mb-1">
+                    <div class="sidebar-section-hdr" onclick="toggleSection('sec-services')">
+                        <h4><span class="section-badge">3</span>Services Section</h4>
+                        <span class="chevron open" id="chev-services">▼</span>
+                    </div>
+                    <div class="sidebar-section-body px-2" id="sec-services">
+                        <label class="flex items-center justify-between p-3 bg-slate-50 rounded-xl cursor-pointer hover:bg-indigo-50 transition-colors mb-3 border border-slate-100">
+                            <span class="text-sm font-semibold text-slate-700">Show Services Section</span>
+                            <span class="toggle-wrap"><input type="checkbox" id="toggle-services" checked><span class="toggle-track"></span></span>
+                        </label>
+                        <div class="mb-3">
+                            <span class="field-label">Section Title</span>
+                            <input type="text" id="input-services-title" placeholder="Our Services" class="editor-input">
+                        </div>
+                        <div class="editor-card mb-2">
+                            <p class="text-xs font-black text-indigo-500 mb-2 uppercase tracking-widest">Card 1</p>
+                            <input type="text" id="input-s1-title" placeholder="Service title" class="editor-input mb-1.5">
+                            <textarea id="input-s1-desc" rows="2" placeholder="Short description..." class="editor-input resize-none text-xs"></textarea>
+                        </div>
+                        <div class="editor-card mb-2">
+                            <p class="text-xs font-black text-purple-500 mb-2 uppercase tracking-widest">Card 2</p>
+                            <input type="text" id="input-s2-title" placeholder="Service title" class="editor-input mb-1.5">
+                            <textarea id="input-s2-desc" rows="2" placeholder="Short description..." class="editor-input resize-none text-xs"></textarea>
+                        </div>
+                        <div class="editor-card">
+                            <p class="text-xs font-black text-emerald-500 mb-2 uppercase tracking-widest">Card 3</p>
+                            <input type="text" id="input-s3-title" placeholder="Service title" class="editor-input mb-1.5">
+                            <textarea id="input-s3-desc" rows="2" placeholder="Short description..." class="editor-input resize-none text-xs"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <hr class="border-slate-100 my-2">
+
+                <!-- 4. Contact & Forms -->
+                <div class="mb-1">
+                    <div class="sidebar-section-hdr" onclick="toggleSection('sec-contact')">
+                        <h4><span class="section-badge">4</span>Contact & Links</h4>
+                        <span class="chevron open" id="chev-contact">▼</span>
+                    </div>
+                    <div class="sidebar-section-body px-2" id="sec-contact">
+                        <div class="mb-3">
+                            <span class="field-label">WhatsApp Number</span>
+                            <input type="text" id="input-whatsapp" placeholder="+1234567890" class="editor-input">
+                        </div>
+                        <div class="mb-3">
+                            <span class="field-label">Contact Email</span>
+                            <input type="email" id="input-email" placeholder="info@client.com" class="editor-input">
+                        </div>
+                        <div class="mb-3">
+                            <span class="field-label">Physical Address</span>
+                            <input type="text" id="input-address" placeholder="123 Main St, City" class="editor-input">
+                        </div>
+                        <div>
+                            <span class="field-label">Formspree Form ID</span>
+                            <input type="text" id="input-formspree" placeholder="xabcdefg" class="editor-input">
+                            <p class="text-xs text-slate-400 mt-1">Get your free ID at formspree.io</p>
+                        </div>
+                    </div>
+                </div>
+                <hr class="border-slate-100 my-2">
+
+                <!-- 5. Section Toggles -->
+                <div class="mb-1">
+                    <div class="sidebar-section-hdr" onclick="toggleSection('sec-toggles')">
+                        <h4><span class="section-badge">5</span>Page Sections</h4>
+                        <span class="chevron open" id="chev-toggles">▼</span>
+                    </div>
+                    <div class="sidebar-section-body px-2" id="sec-toggles">
+                        <div class="space-y-2">
+                            <label class="flex items-center justify-between p-3 bg-slate-50 rounded-xl cursor-pointer hover:bg-indigo-50 transition-colors border border-slate-100">
+                                <span class="text-sm font-semibold text-slate-700">Show Testimonials</span>
+                                <span class="toggle-wrap"><input type="checkbox" id="toggle-testimonials" checked><span class="toggle-track"></span></span>
+                            </label>
+                            <label class="flex items-center justify-between p-3 bg-slate-50 rounded-xl cursor-pointer hover:bg-indigo-50 transition-colors border border-slate-100">
+                                <span class="text-sm font-semibold text-slate-700">Show FAQ</span>
+                                <span class="toggle-wrap"><input type="checkbox" id="toggle-faq" checked><span class="toggle-track"></span></span>
+                            </label>
+                            <label class="flex items-center justify-between p-3 bg-slate-50 rounded-xl cursor-pointer hover:bg-indigo-50 transition-colors border border-slate-100">
+                                <span class="text-sm font-semibold text-slate-700">Show Map</span>
+                                <span class="toggle-wrap"><input type="checkbox" id="toggle-map" checked><span class="toggle-track"></span></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <hr class="border-slate-100 my-2">
+
+                <!-- 6. Testimonials -->
+                <div class="mb-1">
+                    <div class="sidebar-section-hdr" onclick="toggleSection('sec-testimonials')">
+                        <h4><span class="section-badge">6</span>Testimonials</h4>
+                        <span class="chevron open" id="chev-testimonials">▼</span>
+                    </div>
+                    <div class="sidebar-section-body px-2" id="sec-testimonials">
+                        <div class="editor-card mb-2">
+                            <p class="text-xs font-black text-indigo-500 mb-2 uppercase tracking-widest">Review 1</p>
+                            <textarea id="input-t1-text" rows="2" placeholder='"Amazing service!"' class="editor-input resize-none text-xs mb-1.5"></textarea>
+                            <input type="text" id="input-t1-author" placeholder="Customer Name" class="editor-input text-xs">
+                        </div>
+                        <div class="editor-card">
+                            <p class="text-xs font-black text-purple-500 mb-2 uppercase tracking-widest">Review 2</p>
+                            <textarea id="input-t2-text" rows="2" placeholder='"Great experience!"' class="editor-input resize-none text-xs mb-1.5"></textarea>
+                            <input type="text" id="input-t2-author" placeholder="Customer Name" class="editor-input text-xs">
+                        </div>
+                    </div>
+                </div>
+                <hr class="border-slate-100 my-2">
+
+                <!-- 7. FAQ -->
+                <div class="mb-1">
+                    <div class="sidebar-section-hdr" onclick="toggleSection('sec-faq')">
+                        <h4><span class="section-badge">7</span>FAQ</h4>
+                        <span class="chevron open" id="chev-faq">▼</span>
+                    </div>
+                    <div class="sidebar-section-body px-2" id="sec-faq">
+                        <div class="editor-card mb-2">
+                            <p class="text-xs font-black text-indigo-500 mb-2 uppercase tracking-widest">Q&A 1</p>
+                            <input type="text" id="input-f1-q" placeholder="Question..." class="editor-input mb-1.5 text-xs">
+                            <input type="text" id="input-f1-a" placeholder="Answer..." class="editor-input text-xs">
+                        </div>
+                        <div class="editor-card">
+                            <p class="text-xs font-black text-purple-500 mb-2 uppercase tracking-widest">Q&A 2</p>
+                            <input type="text" id="input-f2-q" placeholder="Question..." class="editor-input mb-1.5 text-xs">
+                            <input type="text" id="input-f2-a" placeholder="Answer..." class="editor-input text-xs">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Sidebar Footer Actions -->
+            <div class="p-3 border-t border-slate-100 bg-slate-50 shrink-0 space-y-2">
+                <button onclick="saveProject()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-sm transition-colors flex items-center justify-center gap-2 shadow-md">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                    Save Draft
+                </button>
+                <button onclick="goBack()" class="w-full py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl font-semibold text-sm hover:bg-slate-50 transition-colors flex items-center justify-center gap-1.5">
                     ← Back to Themes
                 </button>
             </div>
         </aside>
 
-        <section class="flex-1 bg-slate-200 p-8 overflow-y-auto custom-scrollbar smooth-scroll relative">
+        <section class="flex-1 canvas-bg p-8 overflow-y-auto custom-scrollbar relative">
             <div class="bg-white w-full max-w-5xl mx-auto shadow-2xl overflow-hidden flex flex-col transition-all mb-10" id="live-preview-canvas">
                 
-                <nav class="p-6 flex justify-between items-center border-b bg-white sticky top-0 z-10">
+                <nav class="px-8 py-5 flex justify-between items-center border-b bg-white sticky top-0 z-10 shadow-sm">
                     <div class="font-bold text-2xl tracking-tight flex items-center gap-3">
                         <img id="preview-logo-img" src="" alt="Brand Logo" class="hidden h-10 object-contain">
-                        <span id="preview-logo-text">Brand</span>
+                        <div id="preview-logo-placeholder" class="preview-logo-placeholder">
+                            <div id="preview-logo-icon-wrap" class="logo-icon bg-indigo-600">
+                                <svg id="preview-logo-icon-svg" class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                            </div>
+                            <span id="preview-logo-text" class="logo-name">Brand</span>
+                        </div>
                     </div>
-                    <div class="hidden md:flex gap-6 font-medium text-slate-600"><a href="#services">Services</a><a href="#about">About</a><a href="#contact">Contact</a></div>
+                    <div class="hidden md:flex gap-8 font-semibold text-slate-600 text-sm">
+                        <a href="#preview-services" class="hover:text-indigo-600 transition-colors">Services</a>
+                        <a href="#about" class="hover:text-indigo-600 transition-colors">About</a>
+                        <a href="#contact" class="hover:text-indigo-600 transition-colors">Contact</a>
+                    </div>
                 </nav>
 
                 <div id="preview-hero-bg" class="dynamic-light-bg px-8 py-32 text-center flex flex-col justify-center items-center transition-colors">
                     <h1 id="preview-title" class="text-6xl mb-6 leading-tight max-w-4xl transition-all">Your Headline</h1>
-                    <p id="preview-subtitle" class="text-2xl text-slate-600 mb-10 max-w-2xl">Your supporting text goes here.</p>
+                    <p id="preview-subtitle" class="text-2xl mb-10 max-w-2xl leading-relaxed">Your supporting text goes here.</p>
                     <div class="flex flex-col sm:flex-row gap-4">
                         <a href="#contact" id="preview-btn-main" class="dynamic-bg px-8 py-4 hover:opacity-90 transition-colors text-lg flex items-center justify-center">Book Now</a>
                         <a id="preview-whatsapp-link" href="#" target="_blank" class="px-8 py-4 bg-white border-2 flex items-center justify-center gap-3 hover:bg-slate-50 transition-colors text-lg">
@@ -263,27 +838,30 @@
                     </div>
                 </div>
 
-                <section id="services" class="px-8 py-24 bg-white border-b">
+                <section id="preview-services" class="px-8 py-24 bg-white border-b">
                     <div class="max-w-5xl mx-auto text-center">
                         <h2 class="text-4xl font-bold mb-12" id="preview-services-title">Our Services</h2>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                             <div class="preview-card p-8 bg-white transition-all">
                                 <div class="dynamic-light-bg w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 transition-colors">
-                                    <svg class="dynamic-text w-8 h-8 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <svg id="preview-s1-icon" class="dynamic-text w-8 h-8 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                                 </div>
-                                <h3 class="text-xl font-bold mb-3">Premium Quality</h3><p class="opacity-75">We offer top-tier services tailored to meet all your needs.</p>
+                                <h3 id="preview-s1-title" class="text-xl font-bold mb-3">Premium Quality</h3>
+                                <p id="preview-s1-desc" class="opacity-75">We offer top-tier services tailored to meet all your needs.</p>
                             </div>
                             <div class="preview-card p-8 bg-white transition-all">
                                 <div class="dynamic-light-bg w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 transition-colors">
-                                    <svg class="dynamic-text w-8 h-8 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                                    <svg id="preview-s2-icon" class="dynamic-text w-8 h-8 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
                                 </div>
-                                <h3 class="text-xl font-bold mb-3">Expert Team</h3><p class="opacity-75">Our professionals are highly trained and ready to assist you.</p>
+                                <h3 id="preview-s2-title" class="text-xl font-bold mb-3">Expert Team</h3>
+                                <p id="preview-s2-desc" class="opacity-75">Our professionals are highly trained and ready to assist you.</p>
                             </div>
                             <div class="preview-card p-8 bg-white transition-all">
                                 <div class="dynamic-light-bg w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 transition-colors">
-                                    <svg class="dynamic-text w-8 h-8 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                                    <svg id="preview-s3-icon" class="dynamic-text w-8 h-8 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                                 </div>
-                                <h3 class="text-xl font-bold mb-3">24/7 Support</h3><p class="opacity-75">We are always available to answer your questions and concerns.</p>
+                                <h3 id="preview-s3-title" class="text-xl font-bold mb-3">24/7 Support</h3>
+                                <p id="preview-s3-desc" class="opacity-75">We are always available to answer your questions and concerns.</p>
                             </div>
                         </div>
                     </div>
@@ -337,6 +915,10 @@
                                     <div class="flex items-center gap-4">
                                         <div class="dynamic-light-bg w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-colors"><svg class="dynamic-text w-5 h-5 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg></div>
                                         <span id="preview-email-text">info@yourbrand.com</span>
+                                    </div>
+                                    <div class="flex items-center gap-4">
+                                        <div class="dynamic-light-bg w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-colors"><svg class="dynamic-text w-5 h-5 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
+                                        <span id="preview-address-text">123 Main St, Central District</span>
                                     </div>
                                 </div>
                             </div>
