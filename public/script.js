@@ -1,10 +1,20 @@
 // ==== STATE MANAGEMENT ====
-let currentStep = 'home'; // 'home', 'categories', 'themes', 'editor'
+let currentStep = 'home'; // 'home', 'categories', 'themes', 'editor', 'admin'
+
+let currentUser = null;
+let authMode = 'signup'; // 'signup' or 'login'
+
+let adminUsersList = [];
+let editingUserId = null;
 
 let projectData = {
     category: '', themeId: '',
     title: '', subtitle: '', color: '',
     logoUrl: '', whatsapp: '', email: '', address: '', formspreeId: '',
+    font: '', titleFont: '', subtitleFont: '', bodyFont: '',
+    titleColor: '', subtitleColor: '', textColor: '#1e293b', heroBgType: 'solid', gradientColor2: '#8b5cf6',
+    showServices: true, servicesTitle: '',
+    s1Title: '', s1Desc: '', s2Title: '', s2Desc: '', s3Title: '', s3Desc: '',
     showTestimonials: true, showFaq: true, showMap: true,
     t1Text: '', t1Author: '', t2Text: '', t2Author: '',
     f1Q: '', f1A: '', f2Q: '', f2A: ''
@@ -18,52 +28,121 @@ const catDefaults = {
     Transfer: { title: "VIP Transport Services", sub: "Reliable, fast, and secure transport for your journey." }
 };
 
+const fontOptions = ['Inter', 'Poppins', 'Montserrat', 'Playfair Display', 'Roboto', 'Raleway', 'Nunito', 'Lato', 'Oswald', 'DM Sans', 'Space Grotesk'];
+
+const gradientPresets = [
+    { from: '#6366f1', to: '#8b5cf6', label: 'Indigo Purple' },
+    { from: '#0ea5e9', to: '#06b6d4', label: 'Sky Cyan' },
+    { from: '#f43f5e', to: '#f97316', label: 'Rose Orange' },
+    { from: '#10b981', to: '#06b6d4', label: 'Emerald Cyan' },
+    { from: '#8b5cf6', to: '#ec4899', label: 'Purple Pink' },
+    { from: '#f59e0b', to: '#ef4444', label: 'Amber Red' },
+    { from: '#1d4ed8', to: '#7c3aed', label: 'Blue Violet' },
+    { from: '#0f172a', to: '#334155', label: 'Dark Slate' },
+    { from: '#14b8a6', to: '#6366f1', label: 'Teal Indigo' },
+    { from: '#dc2626', to: '#9f1239', label: 'Red Rose' }
+];
+
+const catServiceIcons = {
+    Clinic: [
+        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>',
+        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>',
+        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>'
+    ],
+    Fitness: [
+        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>',
+        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>',
+        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>'
+    ],
+    Hotel: [
+        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>',
+        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-1.5-.454M9 6l3 3m0 0l3-3m-3 3V2m0 16l-3-3m3 3l3-3"/>',
+        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>'
+    ],
+    Transfer: [
+        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>',
+        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>',
+        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>'
+    ]
+};
+
+const catServiceDefaults = {
+    Clinic: [
+        { title: 'Patient Care', desc: 'Compassionate, personalized healthcare for every patient.' },
+        { title: 'Health Check', desc: 'Comprehensive diagnostics and screening services.' },
+        { title: 'Quick Appointment', desc: 'Book same-day or next-day appointments easily.' }
+    ],
+    Fitness: [
+        { title: 'Power Training', desc: 'High-intensity workouts designed to maximize your strength.' },
+        { title: 'Fitness Programs', desc: 'Tailored plans for all fitness levels and goals.' },
+        { title: 'Nutrition Plans', desc: 'Custom meal plans to fuel your performance.' }
+    ],
+    Hotel: [
+        { title: 'Luxury Rooms', desc: 'Elegant, fully-equipped rooms for ultimate comfort.' },
+        { title: 'Fine Dining', desc: 'World-class cuisine prepared by our expert chefs.' },
+        { title: 'Premium Service', desc: 'Five-star hospitality from check-in to checkout.' }
+    ],
+    Transfer: [
+        { title: 'Airport Pickup', desc: 'On-time, comfortable transfers from any airport.' },
+        { title: 'City Tours', desc: 'Explore the city in style with our guided tours.' },
+        { title: '24/7 Dispatch', desc: 'Available around the clock for your transport needs.' }
+    ]
+};
+
+// Icon SVG paths per category — color and name are dynamic (from primary color + title)
+const catLogoConfig = {
+    Clinic:   { svgPath: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>' },
+    Fitness:  { svgPath: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>' },
+    Hotel:    { svgPath: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>' },
+    Transfer: { svgPath: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>' }
+};
+
 // ==== THEME ENGINE (5 Distinct Designs) ====
 const themeSystems = {
     SoftMinimal: {
-        name: "Soft Minimal", desc: "Clean layout, soft corners.", color: "#0ea5e9",
-        font: "font-['Inter']", title: "font-extrabold tracking-tight text-slate-900", general: "text-slate-800",
-        btnMain: "rounded-xl font-bold shadow-md border-0",
-        btnWa: "rounded-xl font-bold shadow-sm border border-slate-200 bg-white text-slate-700",
-        card: "rounded-2xl border border-slate-100 shadow-sm bg-white",
-        hero: "bg-slate-50 border-b border-slate-100",
-        canvasWrapper: "rounded-2xl border-0"
+        name: "Soft Minimal", desc: "Clean glass-morphism layout, soft shadows.", color: "#0ea5e9",
+        font: "font-['DM_Sans']", title: "font-extrabold tracking-tight text-slate-900", general: "text-slate-700",
+        btnMain: "rounded-2xl font-bold shadow-lg border-0",
+        btnWa: "rounded-2xl font-bold shadow-sm border border-slate-200 bg-white/80 text-slate-700 backdrop-blur-sm",
+        card: "rounded-2xl border border-slate-100 shadow-lg bg-white hover:shadow-xl hover:-translate-y-1 transition-all",
+        hero: "bg-gradient-to-br from-sky-50 via-white to-indigo-50 border-b border-sky-100",
+        canvasWrapper: "rounded-3xl shadow-2xl border border-white"
     },
     Brutalist: {
-        name: "Brutalist Impact", desc: "Sharp edges, heavy borders.", color: "#e11d48",
+        name: "Brutalist Impact", desc: "Raw, high-contrast, bold statement design.", color: "#e11d48",
         font: "font-['Montserrat']", title: "font-black uppercase tracking-tighter text-black", general: "text-black",
-        btnMain: "rounded-none font-black uppercase tracking-widest border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]",
-        btnWa: "rounded-none font-black uppercase tracking-widest border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white text-black",
-        card: "rounded-none border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] bg-white",
+        btnMain: "rounded-none font-black uppercase tracking-widest border-3 border-black shadow-[5px_5px_0px_0px_rgba(0,0,0,1)]",
+        btnWa: "rounded-none font-black uppercase tracking-widest border-3 border-black shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] bg-white text-black",
+        card: "rounded-none border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-white hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all",
         hero: "bg-white border-b-4 border-black",
-        canvasWrapper: "rounded-none border-4 border-black"
+        canvasWrapper: "rounded-none border-4 border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]"
     },
     Elegant: {
-        name: "Elegant Serif", desc: "Refined luxury, serif font.", color: "#d97706",
-        font: "font-['Playfair_Display']", title: "font-bold tracking-wide text-stone-900", general: "text-stone-800",
-        btnMain: "rounded-none font-semibold uppercase tracking-widest text-sm shadow-md",
-        btnWa: "rounded-none font-semibold uppercase tracking-widest text-sm shadow-sm border border-stone-300 bg-stone-50 text-stone-800",
-        card: "rounded-none border border-stone-200 shadow-sm bg-stone-50",
-        hero: "bg-stone-100 border-b border-stone-200",
-        canvasWrapper: "rounded-none border border-stone-300"
+        name: "Elegant Serif", desc: "Refined luxury with warm tones and serif typography.", color: "#b45309",
+        font: "font-['Playfair_Display']", title: "font-bold tracking-wide text-stone-900", general: "text-stone-700",
+        btnMain: "rounded font-semibold uppercase tracking-widest text-sm shadow-md",
+        btnWa: "rounded font-semibold uppercase tracking-widest text-sm shadow-sm border border-amber-200 bg-amber-50 text-amber-900",
+        card: "rounded border border-amber-100 shadow-md bg-gradient-to-b from-white to-amber-50 hover:shadow-lg transition-shadow",
+        hero: "bg-gradient-to-br from-stone-100 via-amber-50 to-stone-100 border-b border-amber-200",
+        canvasWrapper: "rounded-sm border border-stone-300 shadow-xl"
     },
     VibrantModern: {
-        name: "Vibrant Modern", desc: "Floating elements, pill buttons.", color: "#8b5cf6",
-        font: "font-['Poppins']", title: "font-extrabold tracking-tight text-slate-900", general: "text-slate-800",
-        btnMain: "rounded-full font-bold shadow-xl shadow-current/30 border-0",
-        btnWa: "rounded-full font-bold shadow-md border border-slate-100 bg-white text-slate-800",
-        card: "rounded-3xl border border-slate-100 shadow-xl bg-white",
-        hero: "bg-slate-50 border-b border-slate-100",
-        canvasWrapper: "rounded-[2rem] border-0"
+        name: "Vibrant Modern", desc: "Bold gradients, pill buttons, ultra-modern feel.", color: "#7c3aed",
+        font: "font-['Poppins']", title: "font-extrabold tracking-tight text-slate-900", general: "text-slate-700",
+        btnMain: "rounded-full font-extrabold shadow-2xl border-0",
+        btnWa: "rounded-full font-bold shadow-lg border border-purple-100 bg-white text-slate-800",
+        card: "rounded-3xl border border-purple-50 shadow-xl bg-white hover:shadow-2xl hover:-translate-y-2 transition-all",
+        hero: "bg-gradient-to-br from-violet-50 via-purple-50 to-fuchsia-50 border-b border-purple-100",
+        canvasWrapper: "rounded-[2rem] shadow-2xl border border-purple-50"
     },
     CorporatePro: {
-        name: "Corporate Pro", desc: "Standard professional layout.", color: "#1d4ed8",
-        font: "font-['Roboto']", title: "font-bold text-gray-800", general: "text-gray-700",
-        btnMain: "rounded font-medium shadow-sm border-0",
-        btnWa: "rounded font-medium shadow-sm border border-gray-300 bg-white text-gray-800",
-        card: "rounded border border-gray-200 shadow bg-white",
-        hero: "bg-gray-100 border-b border-gray-300",
-        canvasWrapper: "rounded-lg border border-gray-200"
+        name: "Corporate Pro", desc: "Authoritative, trust-building professional layout.", color: "#1e40af",
+        font: "font-['Space_Grotesk']", title: "font-bold text-slate-900 tracking-tight", general: "text-slate-600",
+        btnMain: "rounded-lg font-bold shadow-md border-0",
+        btnWa: "rounded-lg font-bold shadow-sm border-2 border-slate-200 bg-white text-slate-800",
+        card: "rounded-xl border border-slate-200 shadow-md bg-white hover:shadow-lg hover:border-blue-200 transition-all",
+        hero: "bg-gradient-to-r from-slate-50 via-blue-50 to-slate-50 border-b-2 border-slate-200",
+        canvasWrapper: "rounded-2xl border border-slate-200 shadow-2xl"
     }
 };
 
@@ -80,8 +159,306 @@ function getContrastColor(hex) {
 // ==== APP INITIALIZATION ====
 document.addEventListener('DOMContentLoaded', () => {
     setupListeners();
+    checkAuth();
     loadProjectFromBackend();
 });
+
+// ==== AUTH & ADMIN LOGIC ====
+function checkAuth() {
+    const savedUser = localStorage.getItem('devory_user');
+    if (savedUser) {
+        try {
+            currentUser = JSON.parse(savedUser);
+        } catch(e){}
+    }
+    updateAuthUI();
+}
+
+function updateAuthUI() {
+    const loginBtn = document.getElementById('nav-login-btn');
+    const logoutBtn = document.getElementById('nav-logout-btn');
+    const manageBtn = document.getElementById('nav-manage-btn');
+    const userName = document.getElementById('nav-user-name');
+    
+    if (currentUser) {
+        if(loginBtn) loginBtn.classList.add('hidden');
+        if(logoutBtn) logoutBtn.classList.remove('hidden');
+        if(userName) {
+            userName.textContent = currentUser.name;
+            userName.classList.remove('hidden');
+        }
+        if (manageBtn) {
+            if (currentUser.role === 'admin') manageBtn.classList.remove('hidden');
+            else manageBtn.classList.add('hidden');
+        }
+    } else {
+        if(loginBtn) loginBtn.classList.remove('hidden');
+        if(logoutBtn) logoutBtn.classList.add('hidden');
+        if(manageBtn) manageBtn.classList.add('hidden');
+        if(userName) userName.classList.add('hidden');
+    }
+}
+
+function startSignup(plan) {
+    if (currentUser) {
+        startBuilding();
+        return;
+    }
+    authMode = 'signup';
+    document.getElementById('auth-plan').value = plan;
+    renderAuthModal();
+    document.getElementById('auth-modal').classList.remove('hidden');
+}
+
+function openLoginModal() {
+    authMode = 'login';
+    renderAuthModal();
+    document.getElementById('auth-modal').classList.remove('hidden');
+}
+
+function closeAuthModal() {
+    document.getElementById('auth-modal').classList.add('hidden');
+    document.getElementById('auth-generated-creds').classList.add('hidden');
+    document.getElementById('auth-form').classList.remove('hidden');
+    document.getElementById('auth-toggle-container').classList.remove('hidden');
+}
+
+function toggleAuthMode() {
+    authMode = authMode === 'signup' ? 'login' : 'signup';
+    renderAuthModal();
+}
+
+function renderAuthModal() {
+    const title = document.getElementById('auth-title');
+    const nameGroup = document.getElementById('auth-name-group');
+    const passGroup = document.getElementById('auth-password-group');
+    const toggleLink = document.getElementById('auth-toggle-link');
+    const submitBtn = document.getElementById('auth-submit-btn');
+    const errorMsg = document.getElementById('auth-error');
+
+    errorMsg.classList.add('hidden');
+    
+    if (authMode === 'signup') {
+        title.textContent = 'Sign Up';
+        nameGroup.classList.remove('hidden');
+        passGroup.classList.add('hidden');
+        toggleLink.textContent = 'Already have an account? Log in';
+        submitBtn.textContent = 'Complete Signup';
+        document.getElementById('auth-password').removeAttribute('required');
+        document.getElementById('auth-name').setAttribute('required', 'true');
+    } else {
+        title.textContent = 'Log In';
+        nameGroup.classList.add('hidden');
+        passGroup.classList.remove('hidden');
+        toggleLink.textContent = 'Need an account? Sign up';
+        submitBtn.textContent = 'Log In';
+        document.getElementById('auth-password').setAttribute('required', 'true');
+        document.getElementById('auth-name').removeAttribute('required');
+    }
+}
+
+async function handleAuth(e) {
+    e.preventDefault();
+    const email = document.getElementById('auth-email').value;
+    const errorMsg = document.getElementById('auth-error');
+    errorMsg.classList.add('hidden');
+
+    try {
+        if (authMode === 'signup') {
+            const name = document.getElementById('auth-name').value;
+            const plan = document.getElementById('auth-plan').value;
+            const res = await fetch('/api/auth/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, plan })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Signup failed');
+            
+            currentUser = data.user;
+            localStorage.setItem('devory_user', JSON.stringify(currentUser));
+            updateAuthUI();
+
+            document.getElementById('auth-form').classList.add('hidden');
+            document.getElementById('auth-toggle-container').classList.add('hidden');
+            document.getElementById('auth-generated-creds').classList.remove('hidden');
+            document.getElementById('gen-email').textContent = currentUser.email;
+            document.getElementById('gen-password').textContent = data.generatedPassword;
+
+        } else {
+            const password = document.getElementById('auth-password').value;
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Login failed');
+            
+            currentUser = data.user;
+            localStorage.setItem('devory_user', JSON.stringify(currentUser));
+            updateAuthUI();
+            closeAuthModal();
+            startBuilding();
+        }
+    } catch (err) {
+        errorMsg.textContent = err.message;
+        errorMsg.classList.remove('hidden');
+    }
+}
+
+function closeAuthModalAndStart() {
+    closeAuthModal();
+    startBuilding();
+}
+
+function logout() {
+    currentUser = null;
+    localStorage.removeItem('devory_user');
+    updateAuthUI();
+    goToHomeSection('top');
+}
+
+// ==== ADMIN SPECIFIC LOGIC ====
+function openAdminLogin() {
+    if (currentUser && currentUser.role === 'admin') {
+        showAdminDashboard();
+        return;
+    }
+    document.getElementById('admin-auth-modal').classList.remove('hidden');
+}
+
+function closeAdminLogin() {
+    document.getElementById('admin-auth-modal').classList.add('hidden');
+}
+
+async function handleAdminLogin(e) {
+    e.preventDefault();
+    const email = document.getElementById('admin-login-email').value;
+    const password = document.getElementById('admin-login-password').value;
+    const errorMsg = document.getElementById('admin-login-error');
+    errorMsg.classList.add('hidden');
+
+    try {
+        const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Login failed');
+        if (data.user.role !== 'admin') throw new Error('Access denied. Administrator privileges required.');
+        
+        currentUser = data.user;
+        localStorage.setItem('devory_user', JSON.stringify(currentUser));
+        updateAuthUI();
+        closeAdminLogin();
+        showAdminDashboard();
+    } catch (err) {
+        errorMsg.textContent = err.message;
+        errorMsg.classList.remove('hidden');
+    }
+}
+
+function openUserModal(id = null) {
+    editingUserId = id;
+    const errorMsg = document.getElementById('admin-user-error');
+    errorMsg.classList.add('hidden');
+
+    if (id) {
+        document.getElementById('admin-user-modal-title').textContent = 'Edit User';
+        const user = adminUsersList.find(u => String(u.id) === String(id));
+        if (user) {
+            document.getElementById('admin-user-name').value = user.name || '';
+            document.getElementById('admin-user-email').value = user.email || '';
+            document.getElementById('admin-user-password').value = user.password || '';
+            document.getElementById('admin-user-plan').value = user.plan || 'Starter';
+            document.getElementById('admin-user-role').value = user.role || 'user';
+        }
+    } else {
+        document.getElementById('admin-user-modal-title').textContent = 'Add User';
+        document.getElementById('admin-user-form').reset();
+    }
+    document.getElementById('admin-user-modal').classList.remove('hidden');
+}
+
+function closeUserModal() {
+    editingUserId = null;
+    document.getElementById('admin-user-modal').classList.add('hidden');
+}
+
+async function saveAdminUser(e) {
+    e.preventDefault();
+    const payload = {
+        name: document.getElementById('admin-user-name').value,
+        email: document.getElementById('admin-user-email').value,
+        password: document.getElementById('admin-user-password').value,
+        plan: document.getElementById('admin-user-plan').value,
+        role: document.getElementById('admin-user-role').value,
+    };
+
+    const errorEl = document.getElementById('admin-user-error');
+    errorEl.classList.add('hidden');
+
+    try {
+        const method = editingUserId ? 'PUT' : 'POST';
+        const url = editingUserId ? `/api/admin/users/${editingUserId}` : `/api/admin/users`;
+        const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+
+        let data = {};
+        try { data = await res.json(); } catch(jsonErr) {}
+
+        if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
+        closeUserModal();
+        showAdminDashboard();
+    } catch (err) {
+        errorEl.textContent = err.message || 'Operation failed. Is the server running?';
+        errorEl.classList.remove('hidden');
+    }
+}
+
+async function deleteAdminUser(id) {
+    if (String(id) === '1') return;
+    if (!confirm("Are you sure you want to delete this user?")) return;
+    try {
+        const res = await fetch(`/api/admin/users/${id}`, { method: 'DELETE' });
+        let data = {};
+        try { data = await res.json(); } catch(jsonErr) {}
+        if (!res.ok) throw new Error(data.error || `Delete failed (${res.status})`);
+        showAdminDashboard();
+    } catch (err) {
+        alert('Failed to delete user: ' + err.message);
+    }
+}
+
+async function showAdminDashboard() {
+    currentStep = 'admin';
+    updateViews();
+    try {
+        const res = await fetch('/api/admin/users?_t=' + Date.now(), { cache: 'no-store' });
+        const users = await res.json();
+        adminUsersList = users;
+        const tbody = document.getElementById('admin-users-list');
+        if(tbody) {
+            const planColors = { 'Admin': 'bg-purple-100 text-purple-700', 'Agency': 'bg-emerald-100 text-emerald-700', 'Pro Builder': 'bg-blue-100 text-blue-700', 'Starter': 'bg-slate-100 text-slate-600' };
+            tbody.innerHTML = users.map(u => `
+                <tr class="hover:bg-indigo-50/30 transition-colors">
+                    <td class="px-6 py-4 text-slate-900 font-semibold">${u.name}</td>
+                    <td class="px-6 py-4 text-slate-500 text-sm">${u.email}</td>
+                    <td class="px-6 py-4"><code class="font-mono text-xs bg-slate-100 text-indigo-600 px-2 py-1 rounded">${u.password}</code></td>
+                    <td class="px-6 py-4"><span class="px-2.5 py-1 rounded-full text-xs font-bold ${planColors[u.plan] || 'bg-slate-100 text-slate-600'}">${u.plan || 'Starter'}</span></td>
+                    <td class="px-6 py-4"><span class="text-xs font-bold ${u.role === 'admin' ? 'text-purple-600' : 'text-slate-500'} capitalize">${u.role}</span></td>
+                    <td class="px-6 py-4 text-right">
+                        <button onclick="openUserModal('${u.id}')" class="text-indigo-600 hover:text-indigo-800 font-bold text-xs bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors mr-2">Edit</button>
+                        <button onclick="deleteAdminUser('${u.id}')" ${String(u.id) === '1' ? 'disabled' : ''} class="${String(u.id) === '1' ? 'text-slate-300 cursor-not-allowed bg-slate-50' : 'text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100'} font-bold text-xs px-3 py-1.5 rounded-lg transition-colors">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+    } catch (err) {
+        console.error('Failed to load users', err);
+    }
+}
 
 async function loadProjectFromBackend() {
     // Load from localStorage first (primary – works on Vercel too)
@@ -113,6 +490,14 @@ function goToHomeSection(sectionId) {
 }
 
 function startBuilding() {
+    if (!currentUser) {
+        startSignup('Starter');
+        return;
+    }
+    if (currentUser.role === 'admin') {
+        showAdminDashboard();
+        return;
+    }
     currentStep = 'categories';
     updateViews();
     try { history.pushState({ step: 'categories', data: JSON.parse(JSON.stringify(projectData)) }, ""); } catch (e) { }
@@ -122,6 +507,7 @@ function goBack() {
     if (currentStep === 'editor') { currentStep = 'themes'; updateViews(); }
     else if (currentStep === 'themes') { currentStep = 'categories'; updateViews(); }
     else if (currentStep === 'categories') { goToHomeSection('top'); }
+    else if (currentStep === 'admin') { goToHomeSection('top'); }
 }
 
 // Browser back button support (safely wrapped)
@@ -149,7 +535,7 @@ window.addEventListener('popstate', (e) => {
 function updateViews() {
     window.scrollTo(0, 0);
 
-    const views = ['home', 'categories', 'themes', 'editor'];
+    const views = ['home', 'categories', 'themes', 'editor', 'admin'];
     views.forEach(v => {
         const el = document.getElementById(`view-${v}`);
         if (el) {
@@ -204,7 +590,7 @@ function renderThemesGrid(catName) {
         const textCol = getContrastColor(theme.color);
 
         htmlOutput += `
-        <div onclick="selectTheme('${themeKey}')" class="cursor-pointer bg-white rounded-2xl overflow-hidden shadow-md border hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col group h-[600px] relative">
+        <div onclick="selectTheme('${themeKey}')" class="theme-card bg-white flex flex-col group h-[580px] relative">
             <div class="absolute inset-0 z-10"></div>
             
             <div class="flex-1 overflow-hidden pointer-events-none select-none flex flex-col ${theme.font} border-b bg-slate-50 hide-scroll">
@@ -255,12 +641,51 @@ function selectTheme(themeId) {
     projectData.email = `info@${projectData.category.toLowerCase()}brand.com`;
     projectData.address = `123 Main St, Central District`;
 
+    // Font from theme — set all per-part fonts to the theme default
+    const fontMatch = themeDef.font.match(/\['(.+?)'\]/);
+    const themeFont = fontMatch ? fontMatch[1].replace(/_/g, ' ') : 'Inter';
+    projectData.font = themeFont;
+    projectData.titleFont = themeFont;
+    projectData.subtitleFont = themeFont;
+    projectData.bodyFont = themeFont;
+
+    // Hero style reset
+    projectData.heroBgType = 'solid';
+    projectData.gradientColor2 = '#8b5cf6';
+    projectData.textColor = '#1e293b';
+    // Title/subtitle default colors from theme general tone
+    const isDarkTheme = themeId === 'Brutalist' || themeId === 'CorporatePro';
+    projectData.titleColor = isDarkTheme ? '#000000' : '#0f172a';
+    projectData.subtitleColor = '#64748b';
+
+    // Service defaults from category
+    const svcDefs = catServiceDefaults[projectData.category] || [
+        { title: 'Premium Quality', desc: 'We offer top-tier services tailored to meet all your needs.' },
+        { title: 'Expert Team', desc: 'Our professionals are highly trained and ready to assist you.' },
+        { title: '24/7 Support', desc: 'We are always available to answer your questions and concerns.' }
+    ];
+    projectData.servicesTitle = 'Our Services';
+    projectData.showServices = true;
+    projectData.s1Title = svcDefs[0].title; projectData.s1Desc = svcDefs[0].desc;
+    projectData.s2Title = svcDefs[1].title; projectData.s2Desc = svcDefs[1].desc;
+    projectData.s3Title = svcDefs[2].title; projectData.s3Desc = svcDefs[2].desc;
+
     currentStep = 'editor';
     updateViews();
     updateInputs();
     updatePreview();
 
     try { history.pushState({ step: 'editor', data: JSON.parse(JSON.stringify(projectData)) }, ""); } catch (e) { }
+}
+
+function toggleSection(id) {
+    const body = document.getElementById(id);
+    const chevId = 'chev-' + id.replace('sec-', '');
+    const chev = document.getElementById(chevId);
+    if (!body) return;
+    const isHidden = body.style.display === 'none';
+    body.style.display = isHidden ? '' : 'none';
+    if (chev) chev.classList.toggle('open', isHidden);
 }
 
 // ==== EDITOR ENGINE ====
@@ -276,7 +701,79 @@ function setupListeners() {
 
     attachSafe('input-title', 'input', (e) => { projectData.title = e.target.value; updatePreview(); saveEditToHistory(); });
     attachSafe('input-subtitle', 'input', (e) => { projectData.subtitle = e.target.value; updatePreview(); saveEditToHistory(); });
-    attachSafe('input-color', 'input', (e) => { projectData.color = e.target.value; updatePreview(); saveEditToHistory(); });
+    attachSafe('input-color', 'input', (e) => {
+        projectData.color = e.target.value;
+        const hexEl = document.getElementById('input-color-hex');
+        if (hexEl) hexEl.value = e.target.value;
+        updatePreview(); saveEditToHistory();
+    });
+    attachSafe('input-color-hex', 'input', (e) => {
+        let v = e.target.value;
+        if (!v.startsWith('#')) v = '#' + v;
+        if (/^#[0-9a-fA-F]{6}$/.test(v)) {
+            projectData.color = v;
+            const colorEl = document.getElementById('input-color');
+            if (colorEl) colorEl.value = v;
+            updatePreview(); saveEditToHistory();
+        }
+    });
+    attachSafe('input-text-color', 'input', (e) => {
+        projectData.textColor = e.target.value;
+        const hexEl = document.getElementById('input-text-color-hex');
+        if (hexEl) hexEl.value = e.target.value;
+        updatePreview(); saveEditToHistory();
+    });
+    attachSafe('input-text-color-hex', 'input', (e) => {
+        let v = e.target.value;
+        if (!v.startsWith('#')) v = '#' + v;
+        if (/^#[0-9a-fA-F]{6}$/.test(v)) {
+            projectData.textColor = v;
+            const colorEl = document.getElementById('input-text-color');
+            if (colorEl) colorEl.value = v;
+            updatePreview(); saveEditToHistory();
+        }
+    });
+    attachSafe('input-title-color', 'input', (e) => {
+        projectData.titleColor = e.target.value;
+        const hexEl = document.getElementById('input-title-color-hex');
+        if (hexEl) hexEl.value = e.target.value;
+        updatePreview(); saveEditToHistory();
+    });
+    attachSafe('input-title-color-hex', 'input', (e) => {
+        let v = e.target.value;
+        if (!v.startsWith('#')) v = '#' + v;
+        if (/^#[0-9a-fA-F]{6}$/.test(v)) {
+            projectData.titleColor = v;
+            const el = document.getElementById('input-title-color');
+            if (el) el.value = v;
+            updatePreview(); saveEditToHistory();
+        }
+    });
+    attachSafe('input-subtitle-color', 'input', (e) => {
+        projectData.subtitleColor = e.target.value;
+        const hexEl = document.getElementById('input-subtitle-color-hex');
+        if (hexEl) hexEl.value = e.target.value;
+        updatePreview(); saveEditToHistory();
+    });
+    attachSafe('input-subtitle-color-hex', 'input', (e) => {
+        let v = e.target.value;
+        if (!v.startsWith('#')) v = '#' + v;
+        if (/^#[0-9a-fA-F]{6}$/.test(v)) {
+            projectData.subtitleColor = v;
+            const el = document.getElementById('input-subtitle-color');
+            if (el) el.value = v;
+            updatePreview(); saveEditToHistory();
+        }
+    });
+    attachSafe('input-gradient-color2', 'input', (e) => { projectData.gradientColor2 = e.target.value; updatePreview(); saveEditToHistory(); });
+    attachSafe('toggle-services', 'change', (e) => { projectData.showServices = e.target.checked; updatePreview(); saveEditToHistory(); });
+    attachSafe('input-services-title', 'input', (e) => { projectData.servicesTitle = e.target.value; updatePreview(); saveEditToHistory(); });
+    attachSafe('input-s1-title', 'input', (e) => { projectData.s1Title = e.target.value; updatePreview(); saveEditToHistory(); });
+    attachSafe('input-s1-desc', 'input', (e) => { projectData.s1Desc = e.target.value; updatePreview(); saveEditToHistory(); });
+    attachSafe('input-s2-title', 'input', (e) => { projectData.s2Title = e.target.value; updatePreview(); saveEditToHistory(); });
+    attachSafe('input-s2-desc', 'input', (e) => { projectData.s2Desc = e.target.value; updatePreview(); saveEditToHistory(); });
+    attachSafe('input-s3-title', 'input', (e) => { projectData.s3Title = e.target.value; updatePreview(); saveEditToHistory(); });
+    attachSafe('input-s3-desc', 'input', (e) => { projectData.s3Desc = e.target.value; updatePreview(); saveEditToHistory(); });
     attachSafe('input-whatsapp', 'input', (e) => { projectData.whatsapp = e.target.value; updatePreview(); saveEditToHistory(); });
     attachSafe('input-email', 'input', (e) => { projectData.email = e.target.value; updatePreview(); saveEditToHistory(); });
     attachSafe('input-address', 'input', (e) => { projectData.address = e.target.value; updatePreview(); saveEditToHistory(); });
@@ -296,33 +793,112 @@ function setupListeners() {
     attachSafe('input-f2-q', 'input', (e) => { projectData.f2Q = e.target.value; updatePreview(); saveEditToHistory(); });
     attachSafe('input-f2-a', 'input', (e) => { projectData.f2A = e.target.value; updatePreview(); saveEditToHistory(); });
 
-    attachSafe('input-logo', 'change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const r = new FileReader();
-            r.onload = (ev) => {
-                projectData.logoUrl = ev.target.result;
-                updatePreview();
-                saveEditToHistory();
-            };
-            r.readAsDataURL(file);
-        }
-    });
+    renderFontSelector();
+    renderGradientPresets();
+    updateHeroBgUI();
+}
+
+// ==== FONT & GRADIENT HELPERS ====
+function renderFontSelector() {
+    renderPartFontSelector('title');
+    renderPartFontSelector('subtitle');
+    renderPartFontSelector('body');
+}
+
+function renderPartFontSelector(part) {
+    const container = document.getElementById(`font-sel-${part}`);
+    if (!container) return;
+    const currentFont = projectData[`${part}Font`] || projectData.font || '';
+    container.innerHTML = `<div class="grid grid-cols-2 gap-1">${fontOptions.map(f =>
+        `<button class="font-btn text-xs py-1.5 px-2 ${currentFont === f ? 'active' : ''}" style="font-family:'${f}',sans-serif" onclick="selectPartFont('${part}','${f}')">${f}</button>`
+    ).join('')}</div>`;
+}
+
+function selectPartFont(part, fontName) {
+    projectData[`${part}Font`] = fontName;
+    renderPartFontSelector(part);
+    updatePreview();
+}
+
+function selectFont(fontName) {
+    projectData.font = fontName;
+    renderFontSelector();
+    updatePreview();
+}
+
+function handleLogoChange(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const r = new FileReader();
+    r.onload = (ev) => {
+        projectData.logoUrl = ev.target.result;
+        updatePreview();
+    };
+    r.readAsDataURL(file);
+}
+
+function renderGradientPresets() {
+    const container = document.getElementById('gradient-presets');
+    if (!container) return;
+    container.innerHTML = gradientPresets.map(g =>
+        `<div class="grad-swatch" title="${g.label}" style="background:linear-gradient(135deg,${g.from},${g.to})" onclick="applyGradientPreset('${g.from}','${g.to}')"></div>`
+    ).join('');
+}
+
+function applyGradientPreset(from, to) {
+    projectData.color = from;
+    projectData.gradientColor2 = to;
+    const colorEl = document.getElementById('input-color');
+    if (colorEl) colorEl.value = from;
+    const hexEl = document.getElementById('input-color-hex');
+    if (hexEl) hexEl.value = from;
+    const c2El = document.getElementById('input-gradient-color2');
+    if (c2El) c2El.value = to;
+    updatePreview();
+}
+
+function setHeroBgType(type) {
+    projectData.heroBgType = type;
+    updateHeroBgUI();
+    updatePreview();
+}
+
+function updateHeroBgUI() {
+    const solidBtn = document.getElementById('hero-type-solid');
+    const gradBtn = document.getElementById('hero-type-gradient');
+    const gradOpts = document.getElementById('gradient-options');
+    const isGrad = projectData.heroBgType === 'gradient';
+    if (solidBtn) solidBtn.classList.toggle('active', !isGrad);
+    if (gradBtn) gradBtn.classList.toggle('active', isGrad);
+    if (gradOpts) gradOpts.classList.toggle('hidden', !isGrad);
 }
 
 function updatePreview() {
     const activeTheme = themeSystems[projectData.themeId];
     if (!activeTheme) return;
 
-    // Apply strict structural design classes 
+    // Resolve per-part fonts with cascading fallbacks
+    const themeFontMatch = activeTheme.font.match(/\['(.+?)'\]/);
+    const themeFontName = themeFontMatch ? themeFontMatch[1].replace(/_/g, ' ') : 'Inter';
+    const bodyFontName = projectData.bodyFont || projectData.font || themeFontName;
+    const titleFontName = projectData.titleFont || bodyFontName;
+    const subtitleFontName = projectData.subtitleFont || bodyFontName;
+
+    // Apply body font to canvas (base for all elements)
+    const bodyFontClass = `font-['${bodyFontName.replace(/ /g, '_')}']`;
+
+    // Apply strict structural design classes
     const canvas = document.getElementById('live-preview-canvas');
-    if (canvas) canvas.className = `bg-white w-full max-w-5xl mx-auto shadow-2xl overflow-hidden flex flex-col transition-all mb-10 ${activeTheme.fontFamily} ${activeTheme.canvasWrapper} ${activeTheme.general}`;
+    if (canvas) canvas.className = `bg-white w-full max-w-5xl mx-auto shadow-2xl overflow-hidden flex flex-col transition-all mb-10 ${bodyFontClass} ${activeTheme.canvasWrapper} ${activeTheme.general}`;
 
     const heroBg = document.getElementById('preview-hero-bg');
     if (heroBg) heroBg.className = `dynamic-light-bg px-8 py-32 text-center flex flex-col justify-center items-center transition-all ${activeTheme.hero}`;
 
     const title = document.getElementById('preview-title');
-    if (title) title.className = `text-6xl mb-6 leading-tight max-w-4xl transition-all ${activeTheme.title}`;
+    if (title) {
+        title.className = `text-6xl mb-6 leading-tight max-w-4xl transition-all ${activeTheme.title}`;
+        title.style.fontFamily = `'${titleFontName}', sans-serif`;
+    }
 
     const srvTitle = document.getElementById('preview-services-title');
     if (srvTitle) srvTitle.className = `text-4xl mb-12 ${activeTheme.title}`;
@@ -371,9 +947,29 @@ function updatePreview() {
     updateDetailsSummary('preview-f2-q', projectData.f2Q, 'Do you offer refunds?');
     setTxt('preview-f2-a', projectData.f2A || 'Yes, within 30 days.');
 
+    // Services section
+    const srvSection = document.getElementById('preview-services');
+    if (srvSection) srvSection.style.display = projectData.showServices !== false ? 'block' : 'none';
+    setTxt('preview-services-title', projectData.servicesTitle || 'Our Services');
+    setTxt('preview-s1-title', projectData.s1Title || 'Premium Quality');
+    setTxt('preview-s1-desc', projectData.s1Desc || 'We offer top-tier services tailored to meet all your needs.');
+    setTxt('preview-s2-title', projectData.s2Title || 'Expert Team');
+    setTxt('preview-s2-desc', projectData.s2Desc || 'Our professionals are highly trained and ready to assist you.');
+    setTxt('preview-s3-title', projectData.s3Title || '24/7 Support');
+    setTxt('preview-s3-desc', projectData.s3Desc || 'We are always available to answer your questions and concerns.');
+
+    // Category icons
+    const icons = catServiceIcons[projectData.category];
+    if (icons) {
+        ['preview-s1-icon', 'preview-s2-icon', 'preview-s3-icon'].forEach((id, i) => {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = icons[i];
+        });
+    }
+
     // 🔥 LIVE SMART COLOR ENGINE 🔥
     const rawColor = projectData.color || '#4f46e5';
-    const textColor = getContrastColor(rawColor);
+    const contrastOnColor = getContrastColor(rawColor);
 
     const hexToRgba = (hex, opacity) => {
         try {
@@ -387,24 +983,65 @@ function updatePreview() {
 
     document.querySelectorAll('.dynamic-bg').forEach(el => {
         el.style.backgroundColor = rawColor;
-        el.style.color = textColor;
+        el.style.color = contrastOnColor;
     });
     document.querySelectorAll('.dynamic-text').forEach(el => {
         el.style.color = rawColor;
     });
+
+    // Hero background: solid or gradient
+    const heroBgEl = document.getElementById('preview-hero-bg');
+    if (heroBgEl) {
+        if (projectData.heroBgType === 'gradient') {
+            const c2 = projectData.gradientColor2 || '#8b5cf6';
+            heroBgEl.style.background = `linear-gradient(135deg, ${rawColor}, ${c2})`;
+            heroBgEl.style.backgroundColor = '';
+        } else {
+            heroBgEl.style.background = '';
+            heroBgEl.style.backgroundColor = lightBg;
+        }
+    }
     document.querySelectorAll('.dynamic-light-bg').forEach(el => {
-        el.style.backgroundColor = lightBg;
+        if (el.id !== 'preview-hero-bg') el.style.backgroundColor = lightBg;
     });
 
-    // Handle Logo Visibility
+    // Body text color
+    const bodyTextColor = projectData.textColor || '#1e293b';
+    if (canvas) canvas.style.color = bodyTextColor;
+
+    // Apply hero title and subtitle colors
+    const titleEl = document.getElementById('preview-title');
+    if (titleEl) titleEl.style.color = projectData.titleColor || '#0f172a';
+    const subtitleEl = document.getElementById('preview-subtitle');
+    if (subtitleEl) {
+        subtitleEl.style.color = projectData.subtitleColor || '#64748b';
+        subtitleEl.style.fontFamily = `'${subtitleFontName}', sans-serif`;
+    }
+
+    // Logo placeholder — icon uses category SVG, color and name sync with primary color + title
     const logoImg = document.getElementById('preview-logo-img');
+    const logoPlaceholder = document.getElementById('preview-logo-placeholder');
+    const logoIconWrap = document.getElementById('preview-logo-icon-wrap');
+    const logoIconSvg = document.getElementById('preview-logo-icon-svg');
     const logoText = document.getElementById('preview-logo-text');
-    if (logoImg && logoText) {
-        if (projectData.logoUrl) {
-            logoImg.src = projectData.logoUrl; logoImg.classList.remove('hidden'); logoText.classList.add('hidden');
-        } else {
-            logoImg.classList.add('hidden'); logoText.classList.remove('hidden'); logoText.textContent = projectData.title ? projectData.title.split(' ')[0] : 'Brand';
-        }
+
+    if (projectData.logoUrl) {
+        if (logoImg) { logoImg.src = projectData.logoUrl; logoImg.classList.remove('hidden'); }
+        if (logoPlaceholder) logoPlaceholder.style.display = 'none';
+    } else {
+        if (logoImg) logoImg.classList.add('hidden');
+        if (logoPlaceholder) logoPlaceholder.style.display = '';
+
+        // Icon: category-specific SVG, background = primary color
+        const logoCfg = catLogoConfig[projectData.category];
+        if (logoIconWrap) logoIconWrap.style.background = rawColor;
+        if (logoIconSvg && logoCfg) logoIconSvg.innerHTML = logoCfg.svgPath;
+
+        // Name: derived from the hero title (max 2 words), color = primary color
+        const logoName = projectData.title
+            ? projectData.title.split(' ').slice(0, 2).join(' ')
+            : (projectData.category || 'Brand');
+        if (logoText) { logoText.textContent = logoName; logoText.style.color = rawColor; }
     }
 
     // Handle Forms
@@ -425,12 +1062,29 @@ function updateInputs() {
     setVal('input-title', projectData.title);
     setVal('input-subtitle', projectData.subtitle);
     setVal('input-color', projectData.color);
+    setVal('input-color-hex', projectData.color || '');
+    setVal('input-text-color', projectData.textColor || '#1e293b');
+    setVal('input-text-color-hex', projectData.textColor || '#1e293b');
+    setVal('input-title-color', projectData.titleColor || '#0f172a');
+    setVal('input-title-color-hex', projectData.titleColor || '#0f172a');
+    setVal('input-subtitle-color', projectData.subtitleColor || '#64748b');
+    setVal('input-subtitle-color-hex', projectData.subtitleColor || '#64748b');
+    setVal('input-gradient-color2', projectData.gradientColor2 || '#8b5cf6');
     setVal('input-whatsapp', projectData.whatsapp);
     setVal('input-email', projectData.email);
     setVal('input-address', projectData.address);
     setVal('input-formspree', projectData.formspreeId || '');
 
+    setVal('input-services-title', projectData.servicesTitle || '');
+    setVal('input-s1-title', projectData.s1Title || '');
+    setVal('input-s1-desc', projectData.s1Desc || '');
+    setVal('input-s2-title', projectData.s2Title || '');
+    setVal('input-s2-desc', projectData.s2Desc || '');
+    setVal('input-s3-title', projectData.s3Title || '');
+    setVal('input-s3-desc', projectData.s3Desc || '');
+
     const setCheck = (id, val) => { const el = document.getElementById(id); if (el) el.checked = !!val; };
+    setCheck('toggle-services', projectData.showServices !== false);
     setCheck('toggle-testimonials', projectData.showTestimonials !== false);
     setCheck('toggle-faq', projectData.showFaq !== false);
     setCheck('toggle-map', projectData.showMap !== false);
@@ -444,6 +1098,12 @@ function updateInputs() {
     setVal('input-f1-a', projectData.f1A || '');
     setVal('input-f2-q', projectData.f2Q || '');
     setVal('input-f2-a', projectData.f2A || '');
+
+    renderPartFontSelector('title');
+    renderPartFontSelector('subtitle');
+    renderPartFontSelector('body');
+    renderGradientPresets();
+    updateHeroBgUI();
 }
 
 // ==== DATA SAVING & EXPORTS ====
